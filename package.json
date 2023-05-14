@@ -1,0 +1,90 @@
+{
+  "name": "vscode-arduino-api",
+  "displayName": "Arduino API for VS Code extensions",
+  "description": "Arduino API for Arduino IDE external tools developers using VS Code extensions",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "author": "dankeboy36",
+  "publisher": "dankeboy36",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dankeboy36/vscode-arduino-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dankeboy36/vscode-arduino-api.git"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "arduino",
+    "vscode",
+    "arduino-ide",
+    "vscode-extension",
+    "theia-ide"
+  ],
+  "main": "./dist/extension.js",
+  "files": [
+    "out/api.d.ts"
+  ],
+  "types": "out/api.d.ts",
+  "scripts": {
+    "prepublishOnly": "npm run clean && npm run format && npm run test && npm run lint && npm run package && npm run compile-npm",
+    "compile": "webpack && vsce package",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map && vsce package",
+    "compile-npm": "tsc -p . --declaration --outDir out",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --write .",
+    "test": "node ./out/test/runTest.js",
+    "clean": "rimraf out dist *.vsix"
+  },
+  "dependencies": {
+    "@types/vscode": "^1.78.0"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
+    "@vscode/vsce": "^2.19.0",
+    "eslint": "^8.39.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^5.0.1",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscodeArduinoAPI.updateState",
+        "title": "Update the Arduino State"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vscodeArduinoAPI.updateState",
+          "when": "false"
+        }
+      ]
+    }
+  }
+}

@@ -1,8 +1,8 @@
 {
   "name": "vscode-arduino-api",
   "displayName": "Arduino API for VS Code extensions",
-  "description": "Arduino API for Arduino IDE external tools developers using VS Code extensions",
-  "version": "0.1.0",
+  "description": "API for Arduino IDE 2.x external tools developers using VS Code extensions",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.78.0"
   },
@@ -33,9 +33,9 @@
   "types": "out/api.d.ts",
   "scripts": {
     "prepublishOnly": "npm run clean && npm run format && npm run test && npm run lint && npm run package && npm run compile-npm",
-    "compile": "webpack && vsce package",
+    "compile": "webpack && vsce package --allow-star-activation",
     "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map && vsce package",
+    "package": "webpack --mode production --devtool hidden-source-map && vsce package --allow-star-activation",
     "compile-npm": "tsc -p . --declaration --outDir out",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
@@ -46,7 +46,9 @@
     "clean": "rimraf out dist *.vsix"
   },
   "dependencies": {
-    "@types/vscode": "^1.78.0"
+    "@types/vscode": "^1.78.0",
+    "ardunno-cli": "^0.1.2",
+    "safe-stable-stringify": "^2.4.3"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
@@ -69,22 +71,39 @@
     "webpack-cli": "^5.0.2"
   },
   "activationEvents": [
-    "onStartupFinished"
+    "*"
   ],
   "contributes": {
     "commands": [
       {
-        "command": "vscodeArduinoAPI.updateState",
+        "command": "arduinoAPI.updateState",
         "title": "Update the Arduino State"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "vscodeArduinoAPI.updateState",
+          "command": "arduinoAPI.updateState",
           "when": "false"
         }
       ]
+    },
+    "configuration": {
+      "id": "arduinoAPI",
+      "title": "Arduino API",
+      "properties": {
+        "arduinoAPI.log": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "If `true`, the Arduino state update will be logged to the `Arduino API` _Output Channel_. Defaults to `false`."
+        },
+        "arduinoAPI.compareBeforeUpdate": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "If `true`, the Arduino state update (via the `arduinoAPI.updateState` command) will compare the current state and the new state, and if they are the \"same\", no update will happen. Defaults to `true`.",
+          "deprecationMessage": "This should be used for development purposes to tweaking the state update behavior while this project is in an early state."
+        }
+      }
     }
   }
 }

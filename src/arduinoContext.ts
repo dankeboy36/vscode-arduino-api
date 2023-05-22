@@ -1,29 +1,49 @@
-import * as vscode from 'vscode';
-import type { ArduinoContext, ArduinoState, BoardDetails, Port } from './api';
+import stringify from 'safe-stable-stringify';
+import vscode from 'vscode';
+import type {
+  ArduinoContext,
+  ArduinoState,
+  BoardDetails,
+  CompileSummary,
+  Port,
+} from './api';
 
 export function createArduinoContext(
-  workspaceState: vscode.Memento
+  state: vscode.Memento
 ): ArduinoContext & vscode.Disposable {
-  let debugOutput: vscode.OutputChannel | undefined = undefined;
-  const log = (message: string) => {
-    if (!debugOutput) {
-      debugOutput = vscode.window.createOutputChannel('VS Code Arduino API');
+  // config
+  let log = false;
+  let compareBeforeUpdate = true;
+  const updateLog = () => (log = getWorkspaceConfig('log'));
+  const updateCompareBeforeUpdate = () =>
+    (compareBeforeUpdate = getWorkspaceConfig('compareBeforeUpdate'));
+  updateLog();
+  updateCompareBeforeUpdate();
+
+  // output channel
+  let logOutput: vscode.OutputChannel | undefined = undefined;
+  const debug = (message: string) => {
+    if (log) {
+      if (!logOutput) {
+        logOutput = vscode.window.createOutputChannel('Arduino API');
+      }
+      logOutput.appendLine(message);
     }
-    debugOutput.appendLine(message);
   };
-  const get = <T>(key: keyof ArduinoState) => <T>getState(workspaceState, key);
-  const update = async (
-    key: keyof ArduinoState,
-    value: ArduinoState[keyof ArduinoState]
-  ) => {
-    await updateState(workspaceState, key, value);
-    log(`Updated state of '${key}': ${JSON.stringify(value)}`);
-    emitters[key].fire(value);
-  };
+
+  // events
+  let disposed = false;
   const emitters = createEmitters();
   const onDidChange = createOnDidChange(emitters);
   const toDispose: vscode.Disposable[] = [
-    new vscode.Disposable(() => debugOutput?.dispose()),
+    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
+      if (affectsConfiguration('arduinoAPI.log')) {
+        updateLog();
+      } else if (affectsConfiguration('arduinoAPI.compareBeforeUpdate')) {
+        updateCompareBeforeUpdate();
+      }
+    }),
+    new vscode.Disposable(() => logOutput?.dispose()),
     vscode.commands.registerCommand(updateStateCommandId, (args: unknown) => {
       if (isUpdateStateParams(args)) {
         const { key, value } = args;
@@ -33,20 +53,49 @@ export function createArduinoContext(
         try {
           invalidParams = JSON.stringify(args);
         } catch {}
-        log(`Ignored invalid state update: ${invalidParams}`);
+        throw new Error(`Invalid state update: ${invalidParams}`);
       }
     }),
     ...Object.values(emitters),
   ];
+
+  // state
+  const assertNotDisposed = () => {
+    if (disposed) {
+      throw new Error('Disposed');
+    }
+  };
+  const get = <T>(key: keyof ArduinoState) => {
+    assertNotDisposed();
+    return <T>getState(state, key);
+  };
+  const update = async (
+    key: keyof ArduinoState,
+    value: ArduinoState[keyof ArduinoState]
+  ) => {
+    // the command does not exist if was disposed
+    assertNotDisposed();
+    if (compareBeforeUpdate) {
+      const currentValue = get(key);
+      if (stringify(currentValue) === stringify(value)) {
+        return;
+      }
+    }
+    await updateState(state, key, value);
+    debug(`Updated '${key}': ${JSON.stringify(value)}`);
+    emitters[key].fire(value);
+  };
+
+  // context
   const arduinoContext: ArduinoContext & vscode.Disposable = {
-    get onDidChange() {
-      return onDidChange;
+    onDidChange<T extends keyof ArduinoState>(property: T) {
+      return onDidChange[property] as vscode.Event<ArduinoState[T]>;
     },
     get sketchPath() {
       return get<string>('sketchPath');
     },
-    get buildPath() {
-      return get<string>('buildPath');
+    get compileSummary() {
+      return get<CompileSummary>('compileSummary');
     },
     get fqbn() {
       return get<string>('fqbn');
@@ -64,7 +113,11 @@ export function createArduinoContext(
       return get<string>('dataDirPath');
     },
     dispose(): void {
+      if (disposed) {
+        return;
+      }
       vscode.Disposable.from(...toDispose).dispose();
+      disposed = true;
     },
   };
   return arduinoContext;
@@ -74,10 +127,7 @@ function createOnDidChange(
   emitters: ReturnType<typeof createEmitters>
 ): Record<keyof ArduinoState, vscode.Event<ArduinoState[keyof ArduinoState]>> {
   const record = <
-    Record<
-      keyof ArduinoState,
-      vscode.Event<string | BoardDetails | Port | undefined>
-    >
+    Record<keyof ArduinoState, vscode.Event<ArduinoState[keyof ArduinoState]>>
   >{};
   return Object.entries(emitters).reduce((acc, [name, value]) => {
     const key = <keyof ArduinoState>name;
@@ -97,33 +147,29 @@ function createEmitters(): Record<
 }
 
 function getState<T>(
-  workspaceState: vscode.Memento,
+  state: vscode.Memento,
   key: keyof ArduinoContext
 ): T | undefined {
-  return workspaceState.get<T>(key);
+  return state.get<T>(key);
 }
 
-/**
- * (non-API)
- */
-export const updateStateCommandId = 'vscodeArduinoAPI.updateState';
+async function updateState(
+  state: vscode.Memento,
+  key: keyof ArduinoState,
+  value: ArduinoState[keyof ArduinoState]
+): Promise<void> {
+  return state.update(key, value);
+}
 
+const updateStateCommandId = 'arduinoAPI.updateState';
 interface UpdateStateParams {
   readonly key: keyof ArduinoState;
   readonly value: ArduinoState[keyof ArduinoState];
 }
 
-async function updateState(
-  workspaceState: vscode.Memento,
-  key: keyof ArduinoState,
-  value: ArduinoState[keyof ArduinoState]
-): Promise<void> {
-  return workspaceState.update(key, value);
-}
-
 const noopArduinoState: ArduinoState = {
   sketchPath: undefined,
-  buildPath: undefined,
+  compileSummary: undefined,
   fqbn: undefined,
   boardDetails: undefined,
   port: undefined,
@@ -140,8 +186,31 @@ function isUpdateStateParams(arg: unknown): arg is UpdateStateParams {
       (<UpdateStateParams>arg).key !== undefined &&
       typeof (<UpdateStateParams>arg).key === 'string' &&
       arduinoStateKeys.includes((<UpdateStateParams>arg).key) &&
-      'value' in <UpdateStateParams>arg
+      'value' in <UpdateStateParams>arg // TODO: assert value correctness
     );
   }
   return false;
 }
+
+const configKeys = ['log', 'compareBeforeUpdate'] as const;
+type ConfigKey = (typeof configKeys)[number];
+const defaultConfigValues = {
+  log: false,
+  compareBeforeUpdate: true,
+} as const;
+
+function getWorkspaceConfig<T>(configKey: ConfigKey): T {
+  const defaultValue = defaultConfigValues[configKey];
+  return vscode.workspace
+    .getConfiguration('arduinoAPI')
+    .get<T>(configKey, defaultValue as unknown as T);
+}
+
+/**
+ * (non-API)
+ */
+export const __test = {
+  updateStateCommandId,
+  defaultConfigValues,
+  getWorkspaceConfig,
+} as const;

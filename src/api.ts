@@ -1,5 +1,15 @@
-import type { Disposable, Event } from 'vscode';
-export type { Disposable, Event };
+import type {
+  BoardDetailsResponse,
+  CompileResponse,
+  ConfigOption,
+  ConfigValue,
+  Port,
+  Programmer,
+  ToolsDependencies,
+} from 'ardunno-cli';
+import type { Event } from 'vscode';
+export type { Disposable, Event } from 'vscode';
+export type { ConfigOption, ConfigValue, Port, Programmer };
 
 /**
  * The current state of the Arduino IDE.
@@ -11,10 +21,10 @@ export interface ArduinoState {
   readonly sketchPath: string | undefined;
 
   /**
-   * The absolute filesystem path to the build folder of the sketch. When the `sketchPath` is available but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.
+   * The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.
    * @alpha
    */
-  readonly buildPath: string | undefined;
+  readonly compileSummary: CompileSummary | undefined;
 
   /**
    * The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.
@@ -34,11 +44,13 @@ export interface ArduinoState {
 
   /**
    * Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.
+   * @alpha
    */
   readonly userDirPath: string | undefined;
 
   /**
    * Filesystem path to the [`directories.data`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location.
+   * @alpha
    */
   readonly dataDirPath: string | undefined;
 }
@@ -47,76 +59,55 @@ export interface ArduinoState {
  * Provides access to the current state of the Arduino IDE such as the sketch path, the currently selected board, and port, and etc.
  */
 export interface ArduinoContext extends ArduinoState {
-  readonly onDidChange: Readonly<
-    Record<keyof ArduinoState, Event<ArduinoState[keyof ArduinoState]>>
-  >;
+  onDidChange<T extends keyof ArduinoState>(
+    property: T
+  ): Event<ArduinoState[T]>;
 }
 
-// TODO: all types must come from `ardunno-cli`. See https://github.com/dankeboy36/ardunno-cli.
 /**
  * Supposed to be a [SemVer](https://semver.org/) as a `string` but it's not enforced by Arduino. You might need to coerce the SemVer string.
  */
 export type Version = string;
 
 /**
- * Port represents a board port that may be used to upload or to monitor a board. See [`Port`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Port) for the CLI API.
+ * Build properties used for compiling. The board-specific properties are retrieved from `board.txt` and `platform.txt`. For example, if the `board.txt` contains the `build.tarch=xtensa` entry for the `esp32:esp32:esp32` board, the record includes the `"build.tarch": "xtensa"` property.
  */
-export interface Port {
-  readonly address: string;
-  readonly protocol: string;
-  readonly properties?: Record<string, string>;
-  readonly hardwareId?: string;
-}
+export type BuildProperties = Readonly<Record<string, string>>;
 
 /**
  * The lightweight representation of all details of a particular board. See [`BoardDetailsResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the CLI API.
  * @alpha
  */
-export interface BoardDetails {
-  readonly fqbn: string;
-  readonly requiredTools: Tool[];
-  readonly configOptions: ConfigOption[];
-  readonly programmers: Programmer[];
-  readonly VID: string;
-  readonly PID: string;
+export interface BoardDetails
+  extends Readonly<
+    Pick<BoardDetailsResponse, 'fqbn' | 'configOptions' | 'programmers'>
+  > {
+  readonly toolsDependencies: Tool[];
+  readonly buildProperties: BuildProperties;
 }
 
 /**
  * Required Tool dependencies of a board. See [`ToolsDependencies`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.ToolsDependencies) for the CLI API.
  * @alpha
  */
-export interface Tool {
-  readonly packager: string;
-  readonly name: string;
-  readonly version: Version;
-}
+export type Tool = Readonly<
+  Pick<ToolsDependencies, 'name' | 'version' | 'packager'>
+>;
 
 /**
- * The board's custom configuration options. See [`ConfigOption`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.ConfigOption) for the CLI API.
+ * Summary of a sketch compilation. See [`CompileResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#compileresponse) for the CLI API.
  * @alpha
  */
-export interface ConfigOption {
-  readonly option: string;
-  readonly label: string;
-  readonly values: ConfigValue[];
-}
-
-/**
- * Programmer supported by the board. See [`Programmer`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Programmer) for the CLI API.
- * @alpha
- */
-export interface Programmer {
-  readonly name: string;
-  readonly platform: string;
-  readonly id: string;
-}
-
-/**
- * Value of the configuration option. See [`ConfigValue`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.ConfigValue) for the CLI API.
- * @alpha
- */
-export interface ConfigValue {
-  readonly label: string;
-  readonly value: string;
-  readonly selected: boolean;
+export interface CompileSummary
+  extends Readonly<
+    Pick<
+      CompileResponse,
+      | 'buildPath'
+      | 'usedLibraries'
+      | 'executableSectionsSize'
+      | 'boardPlatform'
+      | 'buildPlatform'
+    >
+  > {
+  readonly buildProperties: BuildProperties;
 }

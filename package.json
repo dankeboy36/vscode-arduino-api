@@ -1,10 +1,11 @@
 {
   "name": "vscode-arduino-api",
-  "displayName": "Arduino API for VS Code extensions",
-  "description": "API for Arduino IDE 2.x external tools developers using VS Code extensions",
-  "version": "0.1.1",
+  "displayName": "Arduino IDE API for VS Code extensions",
+  "description": "Lightweight API between the Arduino IDE and VS Code extensions",
+  "version": "0.1.2",
   "engines": {
-    "vscode": "^1.78.0"
+    "vscode": "^1.78.0",
+    "node": ">=16.14.0"
   },
   "author": "dankeboy36",
   "publisher": "dankeboy36",
@@ -77,7 +78,7 @@
     "commands": [
       {
         "command": "arduinoAPI.updateState",
-        "title": "Update the Arduino State"
+        "title": "Update State"
       }
     ],
     "menus": {

@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert/strict';
 import vscode from 'vscode';
 import type {
   ArduinoContext,
@@ -90,7 +90,7 @@ describe('arduinoContext', () => {
       this.slow(250);
       const property = <keyof ArduinoState>name;
       const value = arduinoContext[property];
-      assert.deepEqual(value, undefined);
+      assert.deepStrictEqual(value, undefined);
       const values: ArduinoState[keyof ArduinoState][] = [];
       toDispose.push(
         arduinoContext.onDidChange(property)((newValue) => {
@@ -99,9 +99,9 @@ describe('arduinoContext', () => {
       );
       await update(property, expectedValue);
       const newValue = arduinoContext[property];
-      assert.deepEqual(newValue, expectedValue);
-      assert.deepEqual(values.length, 1);
-      assert.deepEqual(values[0], expectedValue);
+      assert.deepStrictEqual(newValue, expectedValue);
+      assert.deepStrictEqual(values.length, 1);
+      assert.deepStrictEqual(values[0], expectedValue);
     })
   );
 
@@ -149,11 +149,11 @@ describe('arduinoContext', () => {
         .getConfiguration('arduinoAPI')
         .inspect(configKey);
       assert.notEqual(actualInspect, undefined);
-      assert.equal(actualInspect?.defaultValue, defaultValue);
+      assert.strictEqual(actualInspect?.defaultValue, defaultValue);
       for (const testValue of testValues) {
         await updateWorkspaceConfig(configKey, testValue);
         const actualValue = getWorkspaceConfig(configKey);
-        assert.equal(
+        assert.strictEqual(
           actualValue,
           testValue,
           `failed to get expected config value for '${configKey}'`
@@ -181,12 +181,12 @@ describe('arduinoContext', () => {
       if (property === 'boardDetails') {
         // Fail when enhancement is implemented in the CLI.
         // https://github.com/arduino/arduino-cli/issues/2209
-        assert.notDeepEqual(value, sameValue);
+        assert.notDeepStrictEqual(value, sameValue);
       } else {
-        assert.deepEqual(value, sameValue);
+        assert.deepStrictEqual(value, sameValue);
       }
       await update(property, value);
-      assert.deepEqual(arduinoContext[property], value);
+      assert.deepStrictEqual(arduinoContext[property], value);
 
       const updates: (typeof value | undefined)[] = [];
       toDispose.push(
@@ -197,39 +197,39 @@ describe('arduinoContext', () => {
 
       await updateWorkspaceConfig('compareBeforeUpdate', true);
       await update(property, value);
-      assert.equal(updates.length, 0);
+      assert.strictEqual(updates.length, 0);
       await update(property, sameValue);
       if (property === 'boardDetails') {
         // See special handling of `boardDetails` above.
-        assert.equal(updates.length, 1, JSON.stringify(updates));
+        assert.strictEqual(updates.length, 1, JSON.stringify(updates));
         return this.skip();
       }
-      assert.equal(updates.length, 0, JSON.stringify(updates[0]));
+      assert.strictEqual(updates.length, 0, JSON.stringify(updates[0]));
 
       await updateWorkspaceConfig('compareBeforeUpdate', false);
       await update(property, sameValue);
-      assert.equal(updates.length, 1);
-      assert.deepEqual(updates[0], sameValue);
-      assert.deepEqual(updates[0], value);
+      assert.strictEqual(updates.length, 1);
+      assert.deepStrictEqual(updates[0], sameValue);
+      assert.deepStrictEqual(updates[0], value);
 
       await updateWorkspaceConfig('compareBeforeUpdate', true);
       await update(property, undefined);
-      assert.equal(updates.length, 2);
-      assert.deepEqual(updates[1], undefined);
+      assert.strictEqual(updates.length, 2);
+      assert.deepStrictEqual(updates[1], undefined);
       await update(property, sameValue);
-      assert.equal(updates.length, 3);
-      assert.deepEqual(updates[2], sameValue);
-      assert.deepEqual(updates[2], value);
+      assert.strictEqual(updates.length, 3);
+      assert.deepStrictEqual(updates[2], sameValue);
+      assert.deepStrictEqual(updates[2], value);
 
-      assert.deepEqual(arduinoContext[property], sameValue);
+      assert.deepStrictEqual(arduinoContext[property], sameValue);
     })
   );
 
   it('should error when disposed', async () => {
-    assert.equal('dispose' in arduinoContext, true);
+    assert.strictEqual('dispose' in arduinoContext, true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const disposable = <{ dispose: unknown }>(arduinoContext as any);
-    assert.equal(typeof disposable.dispose === 'function', true);
+    assert.strictEqual(typeof disposable.dispose === 'function', true);
     (<{ dispose(): unknown }>disposable).dispose();
 
     assert.throws(() => arduinoContext.fqbn, /Disposed/);

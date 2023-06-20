@@ -1,8 +1,12 @@
 # vscode-arduino-api
 
-Arduino API for [Arduino IDE 2.x](https://github.com/arduino/arduino-ide) external tools developers using VS Code extensions.
+[![Tests](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml)
 
-This VS Code extension does not provide any functionality but a bridge between the Arduino IDE 2.x and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to explain why this VSIX has been created. This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino). This extension does not work in VS Code.
+[Arduino IDE](<(https://github.com/arduino/arduino-ide)>) API for VS Code extensions.
+
+This VS Code extension does not provide any functionality but a bridge between the Arduino IDE and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to explain why this VSIX has been created.
+
+> ⚠️ This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino). This extension does not work in VS Code.
 
 ## API
 
@@ -67,12 +71,19 @@ If you want to use the Arduino APIs, you have to do the followings:
     }
     ```
 
+## Extension Settings
+
+This extension contributes the following settings:
+
+- `arduinoAPI.log`: set to `true` to enable logging of state updates. It's `false` by default.
+- `arduinoAPI.compareBeforeUpdate`: set to `true` to relax the state update. If `true`, a value will be updated when the new value and the current value are not [`deepStrictEqual`](https://nodejs.org/api/assert.html#comparison-details_1).
+
 ## FAQs
 
 ---
 
 - Q: What does `@alpha` mean?
-- A: This API is in an alpha state and might change. The initial idea of this project was to establish a bare minimum layer and help Arduino IDE 2.x tool developers start with something. I make breaking changes only when necessary, keep it backward compatible, or provide a migration guide in the future. Please prepare for breaking changes.
+- A: This API is in an alpha state and might change. The initial idea of this project was to establish a bare minimum layer and help Arduino IDE tool developers start with something. I make breaking changes only when necessary, keep it backward compatible, or provide a migration guide in the future. Please prepare for breaking changes.
 
 ---
 
@@ -83,6 +94,11 @@ If you want to use the Arduino APIs, you have to do the followings:
 
 - Q: I cannot find the `dankeboy36.vscode-arduino-api` extension in neither the [VS Code Marketplace](https://marketplace.visualstudio.com/vscode) nor [Open VSX Registry](https://open-vsx.org/).
 - A: Correct. This solution targets the [Arduino IDE](https://github.com/arduino/arduino-ide) 2.x. The IDE will contain this VSIX at runtime and will activate it before your tool VSIX. You do not even have to add `dankeboy36.vscode-arduino-api` to the `extensionDependencies`. I might publish the VSIX later when it works in VS Code. By the way, the VSIX is signed by a verified publisher. You can get the latest version from the GitHub [release page](https://github.com/dankeboy36/vscode-arduino-api/releases/latest).
+
+---
+
+- Q: Are there any dependent examples?
+- A: Yes, for example, [dankeboy36/esp-exception-decoder](https://github.com/dankeboy36/esp-exception-decoder).
 
 ---
 

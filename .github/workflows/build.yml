@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     name: test (${{ matrix.os }}, node-${{ matrix.node }}
     strategy:
       fail-fast: false

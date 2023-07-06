@@ -4,7 +4,7 @@
 
 [Arduino IDE](https://github.com/arduino/arduino-ide) API for VS Code extensions.
 
-This VS Code extension does not provide any functionality but a bridge between the Arduino IDE and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to explain why this VSIX has been created.
+This VS Code extension does not provide any functionality but a bridge between the Arduino IDE and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to see why this VSIX has been created.
 
 > ⚠️ This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino).
 
@@ -12,8 +12,8 @@ This VS Code extension does not provide any functionality but a bridge between t
 
 Exposes the Arduino state for VS Code extensions:
 
-| Name             | Description                                                                                                                                                                                                                                                                                                                          | Type                                                                      | Note        |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ----------- |
+| Name             | Description                                                                                                                                                                                                                                                                                                                          | Type                                                                      |    Note     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | :---------: |
 | `sketchPath`     | Absolute filesystem path of the sketch folder.                                                                                                                                                                                                                                                                                       | `string`                                                                  |
 | `compileSummary` | The summary of the latest sketch compilation. When the `sketchPath` is available, but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.                                                                                                                                                               | `CompileSummary`                                                          | ⚠️ `@alpha` |
 | `fqbn`           | The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.                                                                                                                                                                                                                                            | `string`                                                                  |
@@ -82,7 +82,7 @@ This extension contributes the following settings:
 
 ---
 
-- Q: What does `@alpha` mean?
+- Q: What does ⚠️ `@alpha` mean?
 - A: This API is in an alpha state and might change. The initial idea of this project was to establish a bare minimum layer and help Arduino IDE tool developers start with something. I make breaking changes only when necessary, keep it backward compatible, or provide a migration guide in the future. Please prepare for breaking changes.
 
 ---

@@ -1,16 +1,16 @@
 # vscode-arduino-api
 
-[![Tests](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml)
+[![Build](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/build.yml)
 
-[Arduino IDE](<(https://github.com/arduino/arduino-ide)>) API for VS Code extensions.
+[Arduino IDE](https://github.com/arduino/arduino-ide) API for VS Code extensions.
 
 This VS Code extension does not provide any functionality but a bridge between the Arduino IDE and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to explain why this VSIX has been created.
 
-> ⚠️ This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino). This extension does not work in VS Code.
+> ⚠️ This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino).
 
 ## API
 
-Exposes the Arduino context for VS Code extensions:
+Exposes the Arduino state for VS Code extensions:
 
 | Name             | Description                                                                                                                                                                                                                                                                                                                          | Type                                                                      | Note        |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ----------- |
@@ -92,15 +92,5 @@ This extension contributes the following settings:
 
 ---
 
-- Q: I cannot find the `dankeboy36.vscode-arduino-api` extension in neither the [VS Code Marketplace](https://marketplace.visualstudio.com/vscode) nor [Open VSX Registry](https://open-vsx.org/).
-- A: Correct. This solution targets the [Arduino IDE](https://github.com/arduino/arduino-ide) 2.x. The IDE will contain this VSIX at runtime and will activate it before your tool VSIX. You do not even have to add `dankeboy36.vscode-arduino-api` to the `extensionDependencies`. I might publish the VSIX later when it works in VS Code. By the way, the VSIX is signed by a verified publisher. You can get the latest version from the GitHub [release page](https://github.com/dankeboy36/vscode-arduino-api/releases/latest).
-
----
-
 - Q: Are there any dependent examples?
 - A: Yes, for example, [dankeboy36/esp-exception-decoder](https://github.com/dankeboy36/esp-exception-decoder).
-
----
-
-- Q: Are there plans to support it in VS Code?
-- A: Sure.

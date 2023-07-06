@@ -1,4 +1,4 @@
-import stringify from 'safe-stable-stringify';
+import assert from 'node:assert/strict';
 import vscode from 'vscode';
 import type {
   ArduinoContext,
@@ -77,9 +77,10 @@ export function createArduinoContext(
     assertNotDisposed();
     if (compareBeforeUpdate) {
       const currentValue = get(key);
-      if (stringify(currentValue) === stringify(value)) {
+      try {
+        assert.deepStrictEqual(currentValue, value);
         return;
-      }
+      } catch {}
     }
     await updateState(state, key, value);
     debug(`Updated '${key}': ${JSON.stringify(value)}`);

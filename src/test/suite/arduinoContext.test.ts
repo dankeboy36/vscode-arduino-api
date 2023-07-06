@@ -49,8 +49,8 @@ const boardDetails = <BoardDetails>{
 const sameBoardDetails = <BoardDetails>{
   ...boardDetails,
   fqbn: boardDetails.fqbn,
-  toolsDependencies: boardDetails.toolsDependencies.slice().reverse(),
-  programmers: boardDetails.programmers.slice().reverse(),
+  toolsDependencies: boardDetails.toolsDependencies.slice(),
+  programmers: boardDetails.programmers.slice(),
   buildProperties: { x: 'y', 'build.tarch': 'xtensa' },
 };
 
@@ -178,13 +178,7 @@ describe('arduinoContext', () => {
   stateUpdateTests.map((updateTest) =>
     it(`should ignore same value updates when 'compareBeforeUpdate' is 'true' (${updateTest.property})`, async function () {
       const { property, value, sameValue } = updateTest;
-      if (property === 'boardDetails') {
-        // Fail when enhancement is implemented in the CLI.
-        // https://github.com/arduino/arduino-cli/issues/2209
-        assert.notDeepStrictEqual(value, sameValue);
-      } else {
-        assert.deepStrictEqual(value, sameValue);
-      }
+      assert.deepStrictEqual(value, sameValue);
       await update(property, value);
       assert.deepStrictEqual(arduinoContext[property], value);
 
@@ -199,11 +193,6 @@ describe('arduinoContext', () => {
       await update(property, value);
       assert.strictEqual(updates.length, 0);
       await update(property, sameValue);
-      if (property === 'boardDetails') {
-        // See special handling of `boardDetails` above.
-        assert.strictEqual(updates.length, 1, JSON.stringify(updates));
-        return this.skip();
-      }
       assert.strictEqual(updates.length, 0, JSON.stringify(updates[0]));
 
       await updateWorkspaceConfig('compareBeforeUpdate', false);

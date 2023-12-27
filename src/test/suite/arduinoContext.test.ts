@@ -36,6 +36,7 @@ const samePort = <Port>{
 const boardDetails = <BoardDetails>{
   configOptions: [],
   fqbn: 'a:b:c',
+  name: 'ABC',
   programmers: [
     { id: 'one', name: 'one', platform: 'one' },
     { id: 'two', name: 'two', platform: 'two' },
@@ -45,6 +46,7 @@ const boardDetails = <BoardDetails>{
     { name: 'b', packager: 'b', version: '2' },
   ],
   buildProperties: { 'build.tarch': 'xtensa', x: 'y' },
+  defaultProgrammerId: 'two',
 };
 const sameBoardDetails = <BoardDetails>{
   ...boardDetails,

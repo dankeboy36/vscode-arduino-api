@@ -1,11 +1,16 @@
+import { isBoardIdentifier } from 'boards-list';
 import assert from 'node:assert/strict';
 import vscode from 'vscode';
 import type {
   ArduinoContext,
   ArduinoState,
   BoardDetails,
+  ChangeEvent,
+  CliConfig,
   CompileSummary,
   Port,
+  SketchFolder,
+  SketchFoldersChangeEvent,
 } from './api';
 
 export function createArduinoContext(
@@ -31,8 +36,21 @@ export function createArduinoContext(
     }
   };
 
+  const _config: CliConfig = { dataDirPath: undefined, userDirPath: undefined };
+  const sketchFolders: SketchFolder[] = [];
+  const currentSketch: SketchFolder | undefined = undefined;
+
   // events
   let disposed = false;
+  const _onDidChangeCurrentSketch = new vscode.EventEmitter<
+    SketchFolder | undefined
+  >();
+  const _onDidChangeSketchFolders =
+    new vscode.EventEmitter<SketchFoldersChangeEvent>();
+  const _onDidChangeSketch = new vscode.EventEmitter<
+    ChangeEvent<SketchFolder>
+  >();
+  const _onDidChangeConfig = new vscode.EventEmitter<ChangeEvent<CliConfig>>();
   const emitters = createEmitters();
   const onDidChange = createOnDidChange(emitters);
   const toDispose: vscode.Disposable[] = [
@@ -48,6 +66,8 @@ export function createArduinoContext(
       if (isUpdateStateParams(args)) {
         const { key, value } = args;
         return update(key, value);
+      } else if (isUpdateCliConfigParams(args)) {
+        return updateCliConfig(args);
       } else {
         let invalidParams = String(args);
         try {
@@ -57,6 +77,10 @@ export function createArduinoContext(
       }
     }),
     ...Object.values(emitters),
+    _onDidChangeCurrentSketch,
+    _onDidChangeSketchFolders,
+    _onDidChangeSketch,
+    _onDidChangeConfig,
   ];
 
   // state
@@ -69,6 +93,10 @@ export function createArduinoContext(
     assertNotDisposed();
     return <T>getState(state, key);
   };
+  const updateCliConfig = async (args: UpdateCliConfigParams) => {
+    throw new Error('Function not implemented.');
+  };
+
   const update = async (
     key: keyof ArduinoState,
     value: ArduinoState[keyof ArduinoState]
@@ -120,9 +148,19 @@ export function createArduinoContext(
       vscode.Disposable.from(...toDispose).dispose();
       disposed = true;
     },
+    // multi-sketch
+    config: { dataDirPath: undefined, userDirPath: undefined },
+    currentSketch: undefined,
+    onDidChangeConfig: _onDidChangeConfig.event,
+    onDidChangeCurrentSketch: _onDidChangeCurrentSketch.event,
+    onDidChangeSketch: _onDidChangeSketch.event,
+    onDidChangeSketchFolders: _onDidChangeSketchFolders.event,
+    openedSketches: [],
   };
   return arduinoContext;
 }
+
+// export function isChangeEvent<T>(arg: unknown): arg is ChangeEvent<T> {}
 
 function createOnDidChange(
   emitters: ReturnType<typeof createEmitters>
@@ -163,9 +201,85 @@ async function updateState(
 }
 
 const updateStateCommandId = 'arduinoAPI.updateState';
+/**
+ * @deprecated
+ */
 interface UpdateStateParams {
   readonly key: keyof ArduinoState;
   readonly value: ArduinoState[keyof ArduinoState];
+}
+
+type UpdateCliConfigParams = ChangeEvent<CliConfig>;
+
+function isCliConfig(arg: unknown): arg is CliConfig {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    ((<CliConfig>arg).dataDirPath === undefined ||
+      typeof (<CliConfig>arg).dataDirPath === 'string') &&
+    ((<CliConfig>arg).userDirPath === undefined ||
+      typeof (<CliConfig>arg).userDirPath === 'string')
+  );
+}
+
+function isUpdateCliConfigParams(arg: unknown): arg is UpdateCliConfigParams {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    isCliConfig((<UpdateCliConfigParams>arg).object) &&
+    Array.isArray((<UpdateCliConfigParams>arg).changedProperties) &&
+    (<UpdateCliConfigParams>arg).changedProperties.every(
+      (key) => key in (<UpdateCliConfigParams>arg).object
+    )
+  );
+}
+
+type UpdateSketchParams = ChangeEvent<SketchFolder>;
+
+function isSketchFolder(arg: unknown): arg is SketchFolder {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    typeof (<SketchFolder>arg).sketchPath === 'string' &&
+    ((<SketchFolder>arg).board === undefined ||
+      isBoardIdentifier((<SketchFolder>arg).board) ||
+      typeof (<SketchFolder>arg).compileSummary === 'object') &&
+    ((<SketchFolder>arg).compileSummary === undefined ||
+      typeof (<SketchFolder>arg).compileSummary === 'object') &&
+    ((<SketchFolder>arg).port === undefined ||
+      typeof (<SketchFolder>arg).port === 'object')
+  );
+}
+
+function isUpdateSketchParams(arg: unknown): arg is UpdateSketchParams {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    isSketchFolder((<UpdateSketchParams>arg).object) &&
+    Array.isArray((<UpdateSketchParams>arg).changedProperties) &&
+    (<UpdateSketchParams>arg).changedProperties.every(
+      (key) => key in (<UpdateSketchParams>arg).object
+    )
+  );
+}
+
+interface UpdateCurrentSketchParams {
+  readonly currentSketch: SketchFolder | undefined;
+}
+
+function isUpdateCurrentSketchParams(
+  arg: unknown
+): arg is UpdateCurrentSketchParams {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    ((<UpdateCurrentSketchParams>arg).currentSketch === undefined ||
+      isSketchFolder((<UpdateCurrentSketchParams>arg).currentSketch))
+  );
+}
+
+interface UpdateSketchFoldersParams extends SketchFoldersChangeEvent {
+  readonly openedSketches: readonly SketchFolder[];
 }
 
 const noopArduinoState: ArduinoState = {

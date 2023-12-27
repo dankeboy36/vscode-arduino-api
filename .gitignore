@@ -5,3 +5,4 @@ node_modules
 *.vsix
 src/test/test-workspace/*
 !src/test/test-workspace/.gitkeep
+.nyc_output

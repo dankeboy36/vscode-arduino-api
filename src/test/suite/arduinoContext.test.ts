@@ -4,7 +4,6 @@ import type {
   ArduinoContext,
   ArduinoState,
   BoardDetails,
-  CompileSummary,
   Port,
 } from '../../api';
 import { __test } from '../../arduinoContext';
@@ -14,7 +13,7 @@ const { updateStateCommandId, defaultConfigValues, getWorkspaceConfig } =
 
 const extensionId = 'dankeboy36.vscode-arduino-api';
 
-const port = <Port>{
+const port: Port = {
   address: 'address',
   label: 'port label',
   protocol: 'serial',
@@ -25,7 +24,7 @@ const port = <Port>{
   },
   hardwareId: '1730323',
 };
-const samePort = <Port>{
+const samePort: Port = {
   ...port,
   hardwareId: port.hardwareId,
   properties: {
@@ -33,7 +32,7 @@ const samePort = <Port>{
     alma: 'korte',
   },
 };
-const boardDetails = <BoardDetails>{
+const boardDetails: BoardDetails = {
   configOptions: [],
   fqbn: 'a:b:c',
   name: 'ABC',
@@ -48,7 +47,7 @@ const boardDetails = <BoardDetails>{
   buildProperties: { 'build.tarch': 'xtensa', x: 'y' },
   defaultProgrammerId: 'two',
 };
-const sameBoardDetails = <BoardDetails>{
+const sameBoardDetails: BoardDetails = {
   ...boardDetails,
   fqbn: boardDetails.fqbn,
   toolsDependencies: boardDetails.toolsDependencies.slice(),
@@ -72,7 +71,7 @@ describe('arduinoContext', () => {
 
   const suite: Record<keyof ArduinoState, ArduinoState[keyof ArduinoState]> = {
     boardDetails,
-    compileSummary: <CompileSummary>{
+    compileSummary: {
       buildPath: 'path/to/build/folder',
       usedLibraries: [],
       boardPlatform: undefined,

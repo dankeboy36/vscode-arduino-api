@@ -20,29 +20,36 @@ if (!tty.getWindowSize) {
 }
 
 export async function run(): Promise<void> {
-  const nyc = new NYC({
-    ...baseConfig,
-    cwd: path.join(__dirname, '..', '..', '..'),
-    reporter: ['text'],
-    all: true,
-    silent: false,
-    instrument: true,
-    hookRequire: true,
-    hookRunInContext: true,
-    hookRunInThisContext: true,
-    include: ['out/**/*.js'],
-    exclude: ['out/test/**'],
-  });
-  await nyc.reset();
-  await nyc.wrap();
-  Object.keys(require.cache)
-    .filter((f) => nyc.exclude.shouldInstrument(f))
-    .forEach((m) => {
-      console.warn('Module loaded before NYC, invalidating:', m);
-      delete require.cache[m];
-      require(m);
+  // nyc setup
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let nyc: any | undefined = undefined;
+  if (runTestCoverage()) {
+    nyc = new NYC({
+      ...baseConfig,
+      cwd: path.join(__dirname, '..', '..', '..'),
+      reporter: ['text'],
+      all: true,
+      silent: false,
+      instrument: true,
+      hookRequire: true,
+      hookRunInContext: true,
+      hookRunInThisContext: true,
+      include: ['out/**/*.js'],
+      exclude: ['out/test/**'],
     });
 
+    await nyc.reset();
+    await nyc.wrap();
+    Object.keys(require.cache)
+      .filter((f) => nyc.exclude.shouldInstrument(f))
+      .forEach((m) => {
+        console.warn('Module loaded before NYC, invalidating:', m);
+        delete require.cache[m];
+        require(m);
+      });
+  }
+
+  // test
   const testsRoot = path.resolve(__dirname, '..');
   const files = await promisify(glob)('**/**.test.js', { cwd: testsRoot });
   const mocha = new Mocha({
@@ -51,10 +58,13 @@ export async function run(): Promise<void> {
     timeout: noTestTimeout() ? 0 : 10_000,
   });
   files.forEach((file) => mocha.addFile(path.resolve(testsRoot, file)));
-
   const failures = await new Promise<number>((resolve) => mocha.run(resolve));
-  await nyc.writeCoverageFile();
-  console.log(await captureStdout(nyc.report.bind(nyc)));
+
+  if (nyc) {
+    // write coverage
+    await nyc.writeCoverageFile();
+    console.log(await captureStdout(nyc.report.bind(nyc)));
+  }
 
   if (failures > 0) {
     throw new Error(`${failures} tests failed.`);
@@ -65,6 +75,13 @@ function noTestTimeout(): boolean {
   return (
     typeof process.env.NO_TEST_TIMEOUT === 'string' &&
     /true/i.test(process.env.NO_TEST_TIMEOUT)
+  );
+}
+
+function runTestCoverage(): boolean {
+  return !(
+    typeof process.env.NO_TEST_COVERAGE === 'string' &&
+    /true/i.test(process.env.NO_TEST_COVERAGE)
   );
 }
 

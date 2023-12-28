@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { format } from 'node:util';
 import vscode from 'vscode';
 import type {
   ArduinoContext,
@@ -7,12 +8,22 @@ import type {
   ChangeEvent,
   CliConfig,
   Port,
+  SketchFolder,
 } from '../../api';
 import { __test, createArduinoContext } from '../../arduinoContext';
 import { InmemoryState } from '../../inmemoryState';
 
-const { updateStateCommandId, defaultConfigValues, getWorkspaceConfig } =
-  __test;
+const {
+  updateStateCommandId,
+  defaultConfigValues,
+  getWorkspaceConfig,
+  isCliConfig,
+  isSketchFolder,
+  isUpdateCliConfigParams,
+  isUpdateCurrentSketchParams,
+  isUpdateSketchFoldersParams,
+  isUpdateSketchParams,
+} = __test;
 
 const extensionId = 'dankeboy36.vscode-arduino-api';
 
@@ -58,16 +69,135 @@ const sameBoardDetails: BoardDetails = {
   buildProperties: { x: 'y', 'build.tarch': 'xtensa' },
 };
 
+const sketchFolder: SketchFolder = {
+  board: boardDetails,
+  compileSummary: {
+    buildPath: '/path/to/bin',
+    buildProperties: { 'build.tarch': 'xtensa', x: 'y' },
+    usedLibraries: [],
+    executableSectionsSize: [],
+    boardPlatform: undefined,
+    buildPlatform: undefined,
+  },
+  port,
+  sketchPath: '/path/to/sketchbook/my_sketch',
+};
+
 describe('createArduinoContext', () => {
+  describe('isCliConfig', () => {
+    (
+      [
+        [undefined, false],
+        [{ alma: 'korte' }, false],
+        [{ userDirPath: 'path' }, false],
+        [{ dataDirPath: 'path' }, false],
+        [{ userDirPath: true, dataDirPath: 420 }, false],
+        [{ userDirPath: undefined, dataDirPath: undefined }, true],
+        [{ userDirPath: undefined, dataDirPath: 'path' }, true],
+        [{ userDirPath: 'path', dataDirPath: 'path' }, true],
+      ] as [unknown, boolean][]
+    ).map(([input, expected]) =>
+      it(`${format(input)} should${
+        expected ? '' : ' not'
+      } be a valid CLI config`, () =>
+        assert.strictEqual(isCliConfig(input), expected))
+    );
+  });
+
+  describe('isUpdateSketchFoldersParams', () => {
+    const validParams = {
+      openedSketches: [sketchFolder],
+      addedPaths: [sketchFolder.sketchPath],
+      removedPaths: [],
+    };
+
+    it('should be ok when the params is valid', () => {
+      assert.ok(isUpdateSketchFoldersParams(validParams));
+    });
+
+    Object.keys(validParams).map((property) =>
+      it(`should be false when '${property}' is missing`, () => {
+        const copy: Record<string, unknown> = {
+          ...validParams,
+        };
+        delete copy[property];
+        assert.strictEqual(isUpdateSketchFoldersParams(copy), false);
+      })
+    );
+
+    Object.keys(validParams).map((property) =>
+      it(`should be false when '${property}' has invalid value`, () => {
+        const copy: Record<string, unknown> = {
+          ...validParams,
+        };
+        // All props are array at the moment
+        copy[property] = [{ alma: 'korte' }];
+        assert.strictEqual(isUpdateSketchFoldersParams(copy), false);
+      })
+    );
+  });
+
+  describe('isSketchFolder', () => {
+    it("should be ok when the 'board' is undefined", () => {
+      const folder: SketchFolder = {
+        ...sketchFolder,
+        board: undefined,
+      };
+      assert.ok(isSketchFolder(folder));
+    });
+
+    it("should be ok when the 'board' is a name-only identifier", () => {
+      const folder: SketchFolder = {
+        ...sketchFolder,
+        board: { name: 'ABC', fqbn: undefined },
+      };
+      assert.ok(isSketchFolder(folder));
+    });
+
+    it("should be ok when the 'board' is an identifier", () => {
+      const folder: SketchFolder = {
+        ...sketchFolder,
+        board: { name: 'ABC', fqbn: 'a:b:c' },
+      };
+      assert.ok(isSketchFolder(folder));
+    });
+
+    it("should be ok when the 'board' is a complete details", () => {
+      assert.ok(isSketchFolder(sketchFolder));
+    });
+
+    Object.keys(sketchFolder).map((property) =>
+      it(`should be false when '${property}' is missing`, () => {
+        const copy: Record<string, unknown> = {
+          ...sketchFolder,
+        };
+        delete copy[property];
+        assert.strictEqual(isSketchFolder(copy), false);
+      })
+    );
+
+    Object.keys(sketchFolder).map((property) =>
+      it(`should be false when '${property}' has invalid value`, () => {
+        const copy: Record<string, unknown> = {
+          ...sketchFolder,
+        };
+        if (typeof copy[property] === 'string') {
+          copy[property] = { alma: 'korte' };
+        } else {
+          copy[property] = 'alma';
+        }
+        if (property === 'board') {
+          console.log();
+        }
+        assert.strictEqual(isSketchFolder(copy), false);
+      })
+    );
+  });
+
   let toDispose: vscode.Disposable[];
 
   beforeEach(() => (toDispose = []));
   afterEach(() => vscode.Disposable.from(...toDispose).dispose());
-
-  it('should create the context', () => {
-    const context = createArduinoContext(createOptions());
-    toDispose.push(context);
-  });
 
   describe('update', () => {
     it("should expose the 'update' function", () => {
@@ -175,7 +305,7 @@ describe('arduinoContext', () => {
     );
   });
 
-  it('should gracefully handle when  when updating with invalid params', async () => {
+  it('should gracefully handle when updating with invalid params', async () => {
     const circular = { b: 1, a: 0 };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (circular as any).circular = circular;

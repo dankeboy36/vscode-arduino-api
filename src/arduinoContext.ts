@@ -13,9 +13,10 @@ import type {
   SketchFoldersChangeEvent,
 } from './api';
 
-export function createArduinoContext(
+export function activateArduinoContext(
+  context: vscode.ExtensionContext,
   state: vscode.Memento
-): ArduinoContext & vscode.Disposable {
+): ReturnType<typeof createArduinoContext> {
   // config
   let log = false;
   let compareBeforeUpdate = true;
@@ -36,6 +37,45 @@ export function createArduinoContext(
     }
   };
 
+  const options = {
+    debug,
+    state,
+    compareBeforeUpdate() {
+      return compareBeforeUpdate;
+    },
+  };
+  const arduinoContext = createArduinoContext(options);
+
+  // dispose of commands
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
+      if (affectsConfiguration('arduinoAPI.log')) {
+        updateLog();
+      } else if (affectsConfiguration('arduinoAPI.compareBeforeUpdate')) {
+        updateCompareBeforeUpdate();
+      }
+    }),
+    new vscode.Disposable(() => logOutput?.dispose()),
+    vscode.commands.registerCommand(updateStateCommandId, arduinoContext.update)
+  );
+
+  return arduinoContext;
+}
+
+interface UpdateHandler {
+  update(args: unknown): Promise<unknown>;
+}
+
+interface CreateOptions {
+  debug(message: string): void;
+  compareBeforeUpdate(): boolean;
+  readonly state: vscode.Memento;
+}
+
+export function createArduinoContext(
+  options: CreateOptions
+): ArduinoContext & vscode.Disposable & UpdateHandler {
+  const { debug, state } = options;
   const _config: CliConfig = { dataDirPath: undefined, userDirPath: undefined };
   const sketchFolders: SketchFolder[] = [];
   const currentSketch: SketchFolder | undefined = undefined;
@@ -54,28 +94,6 @@ export function createArduinoContext(
   const emitters = createEmitters();
   const onDidChange = createOnDidChange(emitters);
   const toDispose: vscode.Disposable[] = [
-    vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
-      if (affectsConfiguration('arduinoAPI.log')) {
-        updateLog();
-      } else if (affectsConfiguration('arduinoAPI.compareBeforeUpdate')) {
-        updateCompareBeforeUpdate();
-      }
-    }),
-    new vscode.Disposable(() => logOutput?.dispose()),
-    vscode.commands.registerCommand(updateStateCommandId, (args: unknown) => {
-      if (isUpdateStateParams(args)) {
-        const { key, value } = args;
-        return update(key, value);
-      } else if (isUpdateCliConfigParams(args)) {
-        return updateCliConfig(args);
-      } else {
-        let invalidParams = String(args);
-        try {
-          invalidParams = JSON.stringify(args);
-        } catch {}
-        throw new Error(`Invalid state update: ${invalidParams}`);
-      }
-    }),
     ...Object.values(emitters),
     _onDidChangeCurrentSketch,
     _onDidChangeSketchFolders,
@@ -103,7 +121,7 @@ export function createArduinoContext(
   ) => {
     // the command does not exist if was disposed
     assertNotDisposed();
-    if (compareBeforeUpdate) {
+    if (options.compareBeforeUpdate()) {
       const currentValue = get(key);
       try {
         assert.deepStrictEqual(currentValue, value);
@@ -116,7 +134,7 @@ export function createArduinoContext(
   };
 
   // context
-  const arduinoContext: ArduinoContext & vscode.Disposable = {
+  return {
     onDidChange<T extends keyof ArduinoState>(property: T) {
       return onDidChange[property] as vscode.Event<ArduinoState[T]>;
     },
@@ -156,8 +174,21 @@ export function createArduinoContext(
     onDidChangeSketch: _onDidChangeSketch.event,
     onDidChangeSketchFolders: _onDidChangeSketchFolders.event,
     openedSketches: [],
+    update: async function (args: unknown) {
+      if (isUpdateStateParams(args)) {
+        const { key, value } = args;
+        return update(key, value);
+      } else if (isUpdateCliConfigParams(args)) {
+        return updateCliConfig(args);
+      } else {
+        let invalidParams = String(args);
+        try {
+          invalidParams = JSON.stringify(args);
+        } catch {}
+        throw new Error(`Invalid state update: ${invalidParams}`);
+      }
+    },
   };
-  return arduinoContext;
 }
 
 // export function isChangeEvent<T>(arg: unknown): arg is ChangeEvent<T> {}

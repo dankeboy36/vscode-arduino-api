@@ -4,9 +4,12 @@ import type {
   ArduinoContext,
   ArduinoState,
   BoardDetails,
+  ChangeEvent,
+  CliConfig,
   Port,
 } from '../../api';
-import { __test } from '../../arduinoContext';
+import { __test, createArduinoContext } from '../../arduinoContext';
+import { InmemoryState } from '../../inmemoryState';
 
 const { updateStateCommandId, defaultConfigValues, getWorkspaceConfig } =
   __test;
@@ -55,16 +58,74 @@ const sameBoardDetails: BoardDetails = {
   buildProperties: { x: 'y', 'build.tarch': 'xtensa' },
 };
 
+describe('createArduinoContext', () => {
+  let toDispose: vscode.Disposable[];
+
+  beforeEach(() => (toDispose = []));
+  afterEach(() => vscode.Disposable.from(...toDispose).dispose());
+
+  it('should create the context', () => {
+    const context = createArduinoContext(createOptions());
+    toDispose.push(context);
+  });
+
+  describe('update', () => {
+    it("should expose the 'update' function", () => {
+      const context = createArduinoContext(createOptions());
+      toDispose.push(context);
+      assert.ok(typeof context.update === 'function');
+    });
+
+    it('should error when updating with invalid parameters', async () => {
+      const context = createArduinoContext(createOptions());
+      toDispose.push(context);
+      await assert.rejects(
+        context.update({ alma: 'korte' }),
+        /Error: Invalid state update/
+      );
+    });
+
+    it('should update the data directory', async () => {
+      const context = createArduinoContext(createOptions());
+      toDispose.push(context);
+      assert.strictEqual(context.dataDirPath, undefined);
+      assert.strictEqual(context.config.dataDirPath, undefined);
+
+      const config: CliConfig = {
+        dataDirPath: '/path/to/data/dir',
+        userDirPath: undefined,
+      };
+      const event: ChangeEvent<CliConfig> = {
+        changedProperties: ['dataDirPath'],
+        object: config,
+      };
+      await context.update(event);
+      assert.strictEqual(context.dataDirPath, '/path/to/data/dir');
+      assert.strictEqual(context.userDirPath, undefined);
+      assert.strictEqual(context.config.dataDirPath, '/path/to/data/dir');
+      assert.strictEqual(context.config.userDirPath, undefined);
+    });
+  });
+
+  function createOptions() {
+    return {
+      debug: (message: string) => console.log(message),
+      compareBeforeUpdate: () => true,
+      state: new InmemoryState(),
+    };
+  }
+});
+
 describe('arduinoContext', () => {
   let arduinoContext: ArduinoContext;
   const toDispose: vscode.Disposable[] = [];
 
   before(async () => {
     const extension = vscode.extensions.getExtension(extensionId);
-    assert.notEqual(extension, undefined);
+    assert.ok(extension);
     await extension?.activate();
     arduinoContext = extension?.exports;
-    assert.notEqual(arduinoContext, undefined);
+    assert.ok(arduinoContext);
   });
 
   after(() => vscode.Disposable.from(...toDispose).dispose());
@@ -149,7 +210,7 @@ describe('arduinoContext', () => {
       const actualInspect = vscode.workspace
         .getConfiguration('arduinoAPI')
         .inspect(configKey);
-      assert.notEqual(actualInspect, undefined);
+      assert.ok(actualInspect);
       assert.strictEqual(actualInspect?.defaultValue, defaultValue);
       for (const testValue of testValues) {
         await updateWorkspaceConfig(configKey, testValue);
@@ -222,13 +283,7 @@ describe('arduinoContext', () => {
     assert.strictEqual(typeof disposable.dispose === 'function', true);
     (<{ dispose(): unknown }>disposable).dispose();
 
-    assert.throws(() => arduinoContext.fqbn, /Disposed/);
-    await assert.rejects(
-      update('fqbn', undefined),
-      (reason) =>
-        reason instanceof Error &&
-        reason.message === `command '${updateStateCommandId}' not found`
-    );
+    await assert.rejects(update('fqbn', undefined), /Disposed/);
   });
 
   async function update<T = ArduinoState>(

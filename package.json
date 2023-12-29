@@ -1,7 +1,7 @@
 {
   "name": "vscode-arduino-api",
   "displayName": "VS Code Arduino API",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Arduino IDE API for VS Code extensions",
   "categories": [
     "Other"

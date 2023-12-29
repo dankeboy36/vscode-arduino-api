@@ -9,8 +9,6 @@ import type {
 } from 'ardunno-cli';
 import type { BoardIdentifier } from 'boards-list';
 import type { Event } from 'vscode';
-export type { Disposable, Event } from 'vscode';
-export type { BoardIdentifier, ConfigOption, ConfigValue, Port, Programmer };
 
 /**
  * Bare minimum representation of the Arduino CLI [configuration](https://arduino.github.io/arduino-cli/latest/configuration).
@@ -50,11 +48,13 @@ export interface SketchFolder {
    * If platform is installed, the `board` is the lightweight representation of the board's detail. This information is
    * [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
    * for the currently selected board in the sketch folder.
+   * @alpha
    */
   readonly board: BoardDetails | BoardIdentifier | undefined;
 
   /**
    * The currently selected port in the sketch folder.
+   * @alpha
    */
   readonly port: Readonly<Port> | undefined;
 }
@@ -240,3 +240,6 @@ export interface CompileSummary
   > {
   readonly buildProperties: BuildProperties;
 }
+
+export type { Disposable, Event } from 'vscode';
+export type { BoardIdentifier, ConfigOption, ConfigValue, Port, Programmer };

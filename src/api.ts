@@ -12,6 +12,9 @@ import type { Event } from 'vscode';
 export type { Disposable, Event } from 'vscode';
 export type { BoardIdentifier, ConfigOption, ConfigValue, Port, Programmer };
 
+/**
+ * Bare minimum representation of the Arduino CLI [configuration](https://arduino.github.io/arduino-cli/latest/configuration).
+ */
 export interface CliConfig {
   /**
    * Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.
@@ -56,6 +59,9 @@ export interface SketchFolder {
   readonly port: Readonly<Port> | undefined;
 }
 
+/**
+ * An event describing a change to the set of {@link SketchFolder sketch folders}.
+ */
 export interface SketchFoldersChangeEvent {
   /**
    * Added sketch folders.
@@ -121,22 +127,47 @@ export interface ArduinoState {
   readonly dataDirPath: string | undefined;
 }
 
-// TODO: move into ArduinoContext when ArduinoState+onDidChange are gone
-interface ArduinoState2 {
-  readonly currentSketch: SketchFolder | undefined;
-  readonly openedSketches: readonly SketchFolder[];
-  readonly onDidChangeCurrentSketch: Event<SketchFolder | undefined>;
-  readonly onDidChangeSketchFolders: Event<SketchFoldersChangeEvent>;
-  readonly onDidChangeSketch: Event<ChangeEvent<SketchFolder>>;
-
-  readonly config: CliConfig;
-  readonly onDidChangeConfig: Event<ChangeEvent<CliConfig>>;
-}
-
 /**
  * Provides access to the current state of the Arduino IDE such as the sketch path, the currently selected board, and port, and etc.
  */
-export interface ArduinoContext extends ArduinoState, ArduinoState2 {
+export interface ArduinoContext extends ArduinoState {
+  /**
+   * All opened sketch folders in the window.
+   */
+  readonly openedSketches: readonly SketchFolder[];
+
+  /**
+   * The currently active sketch (folder) or `undefined`. The current sketch is the one that currently has focus or most recently had focus.
+   * The current sketch is in the {@link openedSketches opened sketches}.
+   */
+  readonly currentSketch: SketchFolder | undefined;
+
+  /**
+   * An {@link Event} which fires when the {@link currentSketch current sketch} has changed.
+   * *Note* that the event also fires when the active editor changes to `undefined`.
+   */
+  readonly onDidChangeCurrentSketch: Event<SketchFolder | undefined>;
+
+  /**
+   * An event that is emitted when sketch folders are added or removed.
+   */
+  readonly onDidChangeSketchFolders: Event<SketchFoldersChangeEvent>;
+
+  /**
+   * An event that is emitted when the selected {@link SketchFolder.board board}, {@link SketchFolder.port port}, etc., has changed in the {@link SketchFolder sketch folder}.
+   */
+  readonly onDidChangeSketch: Event<ChangeEvent<SketchFolder>>;
+
+  /**
+   * The currently configured Arduino CLI configuration.
+   */
+  readonly config: CliConfig;
+
+  /**
+   * An event that is emitter when the {@link CliConfig.userDirPath sketchbook} (`directories.data`) or the {@link CliConfig.dataDirPath data directory} (`directories.data`) path has changed.
+   */
+  readonly onDidChangeConfig: Event<ChangeEvent<CliConfig>>;
+
   /**
    * @deprecated Use `onDidChangeSketch` and `onDidChangeConfig` instead.
    */
@@ -145,9 +176,18 @@ export interface ArduinoContext extends ArduinoState, ArduinoState2 {
   ): Event<ArduinoState[T]>;
 }
 
+/**
+ * Describes a change event with the new state of the `object` and an array indicating which property has changed.
+ */
 export interface ChangeEvent<T> {
-  readonly changedProperties: readonly (keyof T)[];
+  /**
+   * The new state of the object
+   */
   readonly object: T;
+  /**
+   * An array properties that have changed in the `object`.
+   */
+  readonly changedProperties: readonly (keyof T)[];
 }
 
 /**

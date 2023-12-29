@@ -12,7 +12,11 @@ import type {
   SketchFolder,
   SketchFoldersChangeEvent,
 } from '../../api';
-import { __test, createArduinoContext } from '../../arduinoContext';
+import {
+  __test,
+  activateArduinoContext,
+  createArduinoContext,
+} from '../../arduinoContext';
 import { InmemoryState } from '../../inmemoryState';
 
 const {
@@ -400,6 +404,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating the current sketch but is not opened', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       await assert.rejects(
         context.update({ currentSketch: sketchFolder }),
         /Error: Illegal state. Sketch is not opened/
@@ -408,6 +413,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid params (added/remove must be distinct)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const params = {
         addedPaths: ['path'],
         openedSketches: [],
@@ -421,6 +427,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid params (sketch paths must be unique)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const params = {
         addedPaths: [sketchFolder.sketchPath, sketchFolder.sketchPath],
         openedSketches: [sketchFolder, sketchFolder],
@@ -434,6 +441,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid params (added path is not in new opened)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const params = {
         addedPaths: ['path'],
         openedSketches: [],
@@ -447,6 +455,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid params (removed path is in new opened)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const params = {
         addedPaths: [],
         openedSketches: [{ ...sketchFolder, sketchPath: 'path' }],
@@ -460,6 +469,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid state (removed path is not in current opened)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const params = {
         addedPaths: [],
         openedSketches: [],
@@ -473,6 +483,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating sketch folders with invalid state (added path is already in current opened)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       await context.update(initSketchFoldersChangeEvent); // open a sketch folder
 
       const params = {
@@ -488,6 +499,7 @@ describe('arduinoContext', () => {
 
     it('should error when updating with invalid params', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       await assert.rejects(
         context.update({ manó: '♥' }),
         /Invalid params: {"manó":"♥"}/
@@ -496,6 +508,7 @@ describe('arduinoContext', () => {
 
     it('should gracefully handle when updating with invalid params (non-JSON serializable)', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       const circular = { b: 1, a: 0 };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (circular as any).circular = circular;
@@ -599,6 +612,7 @@ describe('arduinoContext', () => {
       }`, async () => {
         const events: string[] = [];
         const context = createArduinoContext(createOptions());
+        toDispose.push(context);
         assert.strictEqual(context.currentSketch, undefined);
         assert.strictEqual(context.sketchPath, undefined);
 
@@ -719,6 +733,122 @@ describe('arduinoContext', () => {
       })
     );
 
+    it('should log to the output channel if enabled (arduinoAPI.log)', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const subscriptions: { dispose(): any }[] = [];
+      const mockExtensionContext = { subscriptions };
+
+      const lines: string[] = [];
+      const mockOutputChannelFactory = () => {
+        const channelMock = {
+          appendLine(message: string) {
+            lines.push(message);
+          },
+          dispose() {
+            // NOOP
+          },
+        };
+        return channelMock as vscode.OutputChannel;
+      };
+
+      const context = activateArduinoContext(
+        mockExtensionContext,
+        new InmemoryState(),
+        mockOutputChannelFactory
+      );
+      toDispose.push(context, ...subscriptions);
+
+      await updateWorkspaceConfig('log', false);
+
+      await context.update(initSketchFoldersChangeEvent);
+      await context.update({ currentSketch: sketchFolder });
+      assert.deepStrictEqual(context.currentSketch?.board, sketchFolder.board);
+
+      let params: ChangeEvent<SketchFolder> = {
+        object: { ...sketchFolder, board: { name: 'XYZ', fqbn: 'x:y:z' } },
+        changedProperties: ['board'],
+      };
+      await context.update(params);
+      assert.deepStrictEqual(context.currentSketch?.board, {
+        name: 'XYZ',
+        fqbn: 'x:y:z',
+      });
+      assert.deepStrictEqual(lines, []);
+
+      await updateWorkspaceConfig('log', true);
+      params = {
+        object: { ...params.object, board: { name: 'QWE', fqbn: 'q:w:e' } },
+        changedProperties: ['board'],
+      };
+      await context.update(params);
+      assert.deepStrictEqual(context.currentSketch?.board, {
+        name: 'QWE',
+        fqbn: 'q:w:e',
+      });
+      assert.deepStrictEqual(lines, [
+        `Updated 'fqbn': "q:w:e"`,
+        `Updated 'boardDetails': undefined`,
+      ]);
+    });
+
+    it('should compare values before update if enabled', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const subscriptions: { dispose(): any }[] = [];
+      const mockExtensionContext = { subscriptions };
+
+      const mockOutputChannelFactory = () => {
+        const channelMock = {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          appendLine(_: string) {
+            // NOOP
+          },
+          dispose() {
+            // NOOP
+          },
+        };
+        return channelMock as vscode.OutputChannel;
+      };
+
+      const context = activateArduinoContext(
+        mockExtensionContext,
+        new InmemoryState(),
+        mockOutputChannelFactory
+      );
+      toDispose.push(context, ...subscriptions);
+
+      await updateWorkspaceConfig('compareBeforeUpdate', true);
+
+      await context.update(initSketchFoldersChangeEvent);
+      await context.update({ currentSketch: sketchFolder });
+      assert.deepStrictEqual(context.currentSketch?.board, sketchFolder.board);
+
+      const events: string[] = [];
+      toDispose.push(
+        context.onDidChange('fqbn')(() => events.push('deprecated-fqbn')),
+        context.onDidChange('boardDetails')(() =>
+          events.push('deprecated-boardDetails')
+        ),
+        context.onDidChangeSketch(({ changedProperties }) =>
+          events.push(...changedProperties)
+        )
+      );
+
+      const params: ChangeEvent<SketchFolder> = {
+        object: sketchFolder,
+        changedProperties: ['board'],
+      };
+      await context.update(params);
+      assert.deepStrictEqual(events, []);
+
+      await updateWorkspaceConfig('compareBeforeUpdate', false);
+      await context.update(params);
+      assert.deepStrictEqual(events, [
+        'deprecated-fqbn',
+        'deprecated-boardDetails',
+        'board',
+      ]);
+    });
+
     async function updateWorkspaceConfig(
       configKey: ConfigTest['configKey'],
       value: unknown
@@ -732,6 +862,7 @@ describe('arduinoContext', () => {
   describe('dispose', () => {
     it('should error when updating after dispose', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       context.dispose();
 
       await assert.rejects(
@@ -742,6 +873,7 @@ describe('arduinoContext', () => {
 
     it('should be noop when disposing a disposed context', async () => {
       const context = createArduinoContext(createOptions());
+      toDispose.push(context);
       context.dispose();
       assert.doesNotThrow(() => context.dispose());
     });

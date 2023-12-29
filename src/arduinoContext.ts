@@ -15,7 +15,8 @@ import type {
 
 export function activateArduinoContext(
   context: Pick<vscode.ExtensionContext, 'subscriptions'>,
-  state: vscode.Memento
+  state: vscode.Memento,
+  outputChannelFactory: () => vscode.OutputChannel
 ): ReturnType<typeof createArduinoContext> {
   // config
   let log = false;
@@ -31,7 +32,7 @@ export function activateArduinoContext(
   const debug = (message: string) => {
     if (log) {
       if (!logOutput) {
-        logOutput = vscode.window.createOutputChannel('Arduino API');
+        logOutput = outputChannelFactory();
       }
       logOutput.appendLine(message);
     }
@@ -46,17 +47,17 @@ export function activateArduinoContext(
   };
   const arduinoContext = createArduinoContext(options);
 
-  // dispose of commands
+  // dispose config change listener and output channel (if opened)
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(({ affectsConfiguration }) => {
       if (affectsConfiguration('arduinoAPI.log')) {
         updateLog();
-      } else if (affectsConfiguration('arduinoAPI.compareBeforeUpdate')) {
+      }
+      if (affectsConfiguration('arduinoAPI.compareBeforeUpdate')) {
         updateCompareBeforeUpdate();
       }
     }),
-    new vscode.Disposable(() => logOutput?.dispose()),
-    vscode.commands.registerCommand(updateStateCommandId, arduinoContext.update)
+    new vscode.Disposable(() => logOutput?.dispose())
   );
 
   return arduinoContext;
@@ -124,13 +125,12 @@ export function createArduinoContext(
       .find((openedUri) => openedUri === sketchUri);
     return Boolean(match);
   };
-  const assertIsOpened = (sketch: SketchFolder | string | undefined) => {
-    const sketchPath = typeof sketch === 'string' ? sketch : sketch?.sketchPath;
-    if (sketchPath && !isOpenedSketch(sketchPath)) {
+  const assertIsOpened = (sketch: SketchFolder | undefined) => {
+    if (sketch && !isOpenedSketch(sketch.sketchPath)) {
       throw new Error(
-        `Illegal state. Sketch is not opened: ${sketchPath}. Opened sketches: ${JSON.stringify(
-          _openedSketches
-        )}`
+        `Illegal state. Sketch is not opened: ${
+          sketch.sketchPath
+        }. Opened sketches: ${JSON.stringify(_openedSketches)}`
       );
     }
   };
@@ -227,7 +227,7 @@ export function createArduinoContext(
   const updateSketch = async (params: UpdateSketchParam) => {
     assertIsOpened(params.object);
     const changed =
-      options.compareBeforeUpdate() || hasChanged(params, _currentSketch);
+      !options.compareBeforeUpdate() || hasChanged(params, _currentSketch);
     if (changed) {
       // TODO: remove old notifications
       await Promise.all(
@@ -393,8 +393,6 @@ async function updateState(
 ): Promise<void> {
   return state.update(key, value);
 }
-
-const updateStateCommandId = 'arduinoAPI.updateState';
 
 type UpdateCliConfigParams = ChangeEvent<CliConfig>;
 

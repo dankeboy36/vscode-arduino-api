@@ -29,15 +29,16 @@
   ],
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "webpack --mode production --devtool hidden-source-map",
+    "build": "npm run typings && webpack --mode production --devtool hidden-source-map",
     "clean": "rimraf dist out *.vsix",
     "compile": "webpack && vsce package",
     "compile-tests": "tsc -p . --outDir out",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts",
     "release": "semantic-release",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "pretest": "npm run compile-tests",
     "test": "node ./out/test/runTest.js",
+    "typings": "tsc -p . --declaration --declarationMap --outDir out",
     "watch": "webpack --watch",
     "watch-tests": "tsc -p . -w --outDir out"
   },

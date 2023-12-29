@@ -54,6 +54,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Generate Typings
+        run: npm run typings
       - name: Release
         id: release
         run: npm run release

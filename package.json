@@ -1,21 +1,8 @@
 {
   "name": "vscode-arduino-api",
   "displayName": "VS Code Arduino API",
-  "description": "Arduino IDE API for VS Code extensions",
   "version": "0.1.2",
-  "engines": {
-    "vscode": "^1.78.0"
-  },
-  "author": "dankeboy36",
-  "publisher": "dankeboy36",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dankeboy36/vscode-arduino-api/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dankeboy36/vscode-arduino-api.git"
-  },
+  "description": "Arduino IDE API for VS Code extensions",
   "categories": [
     "Other"
   ],
@@ -25,61 +12,36 @@
     "arduino-ide",
     "vscode-extension"
   ],
+  "bugs": {
+    "url": "https://github.com/dankeboy36/vscode-arduino-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dankeboy36/vscode-arduino-api.git"
+  },
+  "license": "MIT",
+  "author": "dankeboy36",
+  "publisher": "dankeboy36",
   "main": "./dist/extension.js",
+  "types": "out/api.d.ts",
   "files": [
     "out/api.d.ts"
   ],
-  "types": "out/api.d.ts",
   "scripts": {
-    "compile": "webpack && vsce package",
-    "watch": "webpack --watch",
     "prebuild": "rimraf dist",
-    "build": "webpack --mode production --devtool hidden-source-map",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "test": "node ./out/test/runTest.js",
-    "lint": "eslint src --ext ts",
-    "format": "prettier --write .",
+    "build": "npm run typings && webpack --mode production --devtool hidden-source-map",
     "clean": "rimraf dist out *.vsix",
-    "release": "semantic-release"
+    "compile": "webpack && vsce package",
+    "compile-tests": "tsc -p . --outDir out",
+    "format": "prettier --write .",
+    "lint": "eslint src --ext ts",
+    "release": "semantic-release",
+    "pretest": "npm run compile-tests",
+    "test": "node ./out/test/runTest.js",
+    "typings": "tsc -p . --declaration --declarationMap --outDir out",
+    "watch": "webpack --watch",
+    "watch-tests": "tsc -p . -w --outDir out"
   },
-  "dependencies": {
-    "@types/vscode": "^1.78.0",
-    "ardunno-cli": "^0.1.2"
-  },
-  "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/exec": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/release-notes-generator": "^11.0.4",
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.59.1",
-    "@vscode/test-electron": "^2.3.0",
-    "@vscode/vsce": "^2.19.0",
-    "eslint": "^8.39.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "glob": "^8.1.0",
-    "mocha": "^10.2.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^5.0.1",
-    "semantic-release": "^21.0.7",
-    "semantic-release-vsce": "^5.5.10",
-    "ts-loader": "^9.4.2",
-    "typescript": "^5.0.4",
-    "webpack": "^5.81.0",
-    "webpack-cli": "^5.0.2"
-  },
-  "vsce": {
-    "allowStarActivation": true
-  },
-  "activationEvents": [
-    "*"
-  ],
   "contributes": {
     "commands": [
       {
@@ -87,14 +49,6 @@
         "title": "Update State"
       }
     ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "arduinoAPI.updateState",
-          "when": "false"
-        }
-      ]
-    },
     "configuration": {
       "id": "arduinoAPI",
       "title": "Arduino API",
@@ -111,6 +65,59 @@
           "deprecationMessage": "This should be used for development purposes to tweaking the state update behavior while this project is in an early state."
         }
       }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "arduinoAPI.updateState",
+          "when": "false"
+        }
+      ]
     }
+  },
+  "activationEvents": [
+    "*"
+  ],
+  "dependencies": {
+    "@types/vscode": "^1.78.0",
+    "ardunno-cli": "^0.1.8",
+    "boards-list": "^1.1.0"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/release-notes-generator": "^11.0.4",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.39.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.7.1",
+    "prettier-plugin-packagejson": "^2.4.7",
+    "rimraf": "^5.0.1",
+    "semantic-release": "^21.0.7",
+    "semantic-release-vsce": "^5.6.4",
+    "source-map-support": "^0.5.21",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2"
+  },
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "vsce": {
+    "allowStarActivation": true
   }
 }

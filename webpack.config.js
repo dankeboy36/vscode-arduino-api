@@ -39,4 +39,5 @@ const extensionConfig = {
     level: 'log',
   },
 };
+
 module.exports = [extensionConfig];

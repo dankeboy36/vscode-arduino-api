@@ -7,41 +7,13 @@ import type {
   Programmer,
   ToolsDependencies,
 } from 'ardunno-cli';
+import type { BoardIdentifier } from 'boards-list';
 import type { Event } from 'vscode';
-export type { Disposable, Event } from 'vscode';
-export type { ConfigOption, ConfigValue, Port, Programmer };
 
 /**
- * The current state of the Arduino IDE.
+ * Bare minimum representation of the Arduino CLI [configuration](https://arduino.github.io/arduino-cli/latest/configuration).
  */
-export interface ArduinoState {
-  /**
-   * Absolute filesystem path of the sketch folder.
-   */
-  readonly sketchPath: string | undefined;
-
-  /**
-   * The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.
-   * @alpha
-   */
-  readonly compileSummary: CompileSummary | undefined;
-
-  /**
-   * The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.
-   */
-  readonly fqbn: string | undefined;
-
-  /**
-   * Lightweight representation of the board's detail. This information is [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the currently selected board. It can be `undefined` if the `fqbn` is defined but the platform is not installed.
-   * @alpha
-   */
-  readonly boardDetails: BoardDetails | undefined;
-
-  /**
-   * The currently selected port in the Arduino IDE.
-   */
-  readonly port: Port | undefined;
-
+export interface CliConfig {
   /**
    * Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.
    * @alpha
@@ -56,12 +28,166 @@ export interface ArduinoState {
 }
 
 /**
+ * The current state in the sketch folder. For example, the FQBN of the selected board, the selected port, etc.
+ */
+export interface SketchFolder {
+  /**
+   * Absolute filesystem path of the sketch folder.
+   */
+  readonly sketchPath: string;
+
+  /**
+   * The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the compile summary can be `undefined`.
+   * @alpha
+   */
+  readonly compileSummary: CompileSummary | undefined;
+
+  /**
+   * The currently selected board associated with the sketch. If the `board` is undefined, no board is selected.
+   * If the `board` is a `BoardIdentifier`, it could be a recognized board on a detected port, but the board's platform could be absent.
+   * If platform is installed, the `board` is the lightweight representation of the board's detail. This information is
+   * [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
+   * for the currently selected board in the sketch folder.
+   * @alpha
+   */
+  readonly board: BoardDetails | BoardIdentifier | undefined;
+
+  /**
+   * The currently selected port in the sketch folder.
+   * @alpha
+   */
+  readonly port: Readonly<Port> | undefined;
+}
+
+/**
+ * An event describing a change to the set of {@link SketchFolder sketch folders}.
+ */
+export interface SketchFoldersChangeEvent {
+  /**
+   * Added sketch folders.
+   */
+  readonly addedPaths: readonly string[];
+  /**
+   * Removed sketch folders.
+   */
+  readonly removedPaths: readonly string[];
+}
+
+/**
+ * The current state of the Arduino IDE.
+ */
+export interface ArduinoState {
+  /**
+   * Absolute filesystem path of the sketch folder.
+   *
+   * @deprecated Use `arduinoContext?.currentSketch?.sketchPath` instead.
+   */
+  readonly sketchPath: string | undefined;
+
+  /**
+   * The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.
+   *
+   * @deprecated Use `arduinoContext?.currentSketch?.compileSummary` instead.
+   */
+  readonly compileSummary: CompileSummary | undefined;
+
+  /**
+   * The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.
+   *
+   * @deprecated Use `arduinoContext?.currentSketch?.board?.fqbn` instead.
+   */
+  readonly fqbn: string | undefined;
+
+  /**
+   * Lightweight representation of the board's detail. This information is [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the currently selected board. It can be `undefined` if the `fqbn` is defined but the platform is not installed.
+   *
+   * @deprecated Use `arduinoContext?.currentSketch?.boardDetails` instead.
+   */
+  readonly boardDetails: BoardDetails | undefined;
+
+  /**
+   * The currently selected port in the Arduino IDE.
+   *
+   * @deprecated Use `arduinoContext?.currentSketch?.port` instead.
+   */
+  readonly port: Port | undefined;
+
+  /**
+   * Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.
+   *
+   * @deprecated Use `arduinoContext?.config?.userDirPath` instead.
+   */
+  readonly userDirPath: string | undefined;
+
+  /**
+   * Filesystem path to the [`directories.data`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location.
+   *
+   * @deprecated Use `arduinoContext?.config?.dataDirPath` instead.
+   */
+  readonly dataDirPath: string | undefined;
+}
+
+/**
  * Provides access to the current state of the Arduino IDE such as the sketch path, the currently selected board, and port, and etc.
  */
 export interface ArduinoContext extends ArduinoState {
+  /**
+   * All opened sketch folders in the window.
+   */
+  readonly openedSketches: readonly SketchFolder[];
+
+  /**
+   * The currently active sketch (folder) or `undefined`. The current sketch is the one that currently has focus or most recently had focus.
+   * The current sketch is in the {@link openedSketches opened sketches}.
+   */
+  readonly currentSketch: SketchFolder | undefined;
+
+  /**
+   * An {@link Event} that is emitted when the {@link currentSketch current sketch} has changed.
+   * *Note* that the event also fires when the active editor changes to `undefined`.
+   */
+  readonly onDidChangeCurrentSketch: Event<SketchFolder | undefined>;
+
+  /**
+   * An event that is emitted when sketch folders are added or removed.
+   */
+  readonly onDidChangeSketchFolders: Event<SketchFoldersChangeEvent>;
+
+  /**
+   * An event that is emitted when the selected {@link SketchFolder.board board}, {@link SketchFolder.port port}, etc., has changed in the {@link SketchFolder sketch folder}.
+   */
+  readonly onDidChangeSketch: Event<ChangeEvent<SketchFolder>>;
+
+  /**
+   * The currently configured Arduino CLI configuration.
+   */
+  readonly config: CliConfig;
+
+  /**
+   * An event that is emitter when the {@link CliConfig.userDirPath sketchbook} (`directories.data`) or the {@link CliConfig.dataDirPath data directory} (`directories.data`) path has changed.
+   */
+  readonly onDidChangeConfig: Event<ChangeEvent<CliConfig>>;
+
+  /**
+   * @deprecated Use `onDidChangeSketch` and `onDidChangeConfig` instead.
+   */
   onDidChange<T extends keyof ArduinoState>(
     property: T
   ): Event<ArduinoState[T]>;
+}
+
+/**
+ * Describes a change event with the new state of the `object` and an array indicating which property has changed.
+ */
+export interface ChangeEvent<T> {
+  /**
+   * The new state of the object
+   */
+  readonly object: T;
+  /**
+   * An array properties that have changed in the `object`.
+   */
+  readonly changedProperties: readonly (keyof T)[];
 }
 
 /**
@@ -80,7 +206,10 @@ export type BuildProperties = Readonly<Record<string, string>>;
  */
 export interface BoardDetails
   extends Readonly<
-    Pick<BoardDetailsResponse, 'fqbn' | 'configOptions' | 'programmers'>
+    Pick<
+      BoardDetailsResponse,
+      'fqbn' | 'name' | 'configOptions' | 'programmers' | 'defaultProgrammerId'
+    >
   > {
   readonly toolsDependencies: Tool[];
   readonly buildProperties: BuildProperties;
@@ -111,3 +240,6 @@ export interface CompileSummary
   > {
   readonly buildProperties: BuildProperties;
 }
+
+export type { Disposable, Event } from 'vscode';
+export type { BoardIdentifier, ConfigOption, ConfigValue, Port, Programmer };

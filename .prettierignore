@@ -1,3 +1,6 @@
 out
 dist
 .vscode-test
+.nyc_output
+CHANGELOG.md
+src/test/test-workspace

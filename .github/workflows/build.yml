@@ -30,6 +30,8 @@ jobs:
         run: npm ci
       - name: Check Format
         run: npm run format && git diff --exit-code
+      - name: Lint
+        run: npm run lint
       - name: Test
         uses: coactions/setup-xvfb@v1
         with:

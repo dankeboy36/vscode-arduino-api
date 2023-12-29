@@ -14,7 +14,7 @@ import type {
 } from './api';
 
 export function activateArduinoContext(
-  context: vscode.ExtensionContext,
+  context: Pick<vscode.ExtensionContext, 'subscriptions'>,
   state: vscode.Memento
 ): ReturnType<typeof createArduinoContext> {
   // config
@@ -62,10 +62,6 @@ export function activateArduinoContext(
   return arduinoContext;
 }
 
-interface UpdateHandler {
-  update(args: unknown): Promise<unknown>;
-}
-
 interface CreateOptions {
   debug(message: string): void;
   compareBeforeUpdate(): boolean;
@@ -74,7 +70,8 @@ interface CreateOptions {
 
 export function createArduinoContext(
   options: CreateOptions
-): ArduinoContext & vscode.Disposable & UpdateHandler {
+): ArduinoContext &
+  vscode.Disposable & { update(args: unknown): Promise<unknown> } {
   const { debug, state } = options;
 
   // events
@@ -122,23 +119,16 @@ export function createArduinoContext(
     openedSketches: readonly SketchFolder[] = _openedSketches
   ) => {
     const sketchUri = vscode.Uri.file(sketchPath).toString();
-    const matches = openedSketches
+    const match = openedSketches
       .map(({ sketchPath }) => vscode.Uri.file(sketchPath).toString())
-      .filter((openedUri) => openedUri === sketchUri);
-    if (matches.length > 2) {
-      throw new Error(
-        `Duplicate opened sketch folders: ${sketchPath}, ${JSON.stringify(
-          openedSketches
-        )}`
-      );
-    }
-    return matches.length === 1;
+      .find((openedUri) => openedUri === sketchUri);
+    return Boolean(match);
   };
   const assertIsOpened = (sketch: SketchFolder | string | undefined) => {
     const sketchPath = typeof sketch === 'string' ? sketch : sketch?.sketchPath;
     if (sketchPath && !isOpenedSketch(sketchPath)) {
       throw new Error(
-        `Sketch is not opened: ${sketchPath}. Opened sketches: ${JSON.stringify(
+        `Illegal state. Sketch is not opened: ${sketchPath}. Opened sketches: ${JSON.stringify(
           _openedSketches
         )}`
       );
@@ -163,6 +153,27 @@ export function createArduinoContext(
     }
   };
   const updateSketchFolders = (params: UpdateSketchFoldersParams) => {
+    if (
+      params.addedPaths.some((sketchPath) =>
+        params.removedPaths.includes(sketchPath)
+      )
+    ) {
+      throw new Error(
+        `Illegal argument. Added/removed paths must be distinct: ${JSON.stringify(
+          params
+        )}`
+      );
+    }
+    const distinctSketchPaths = new Set(
+      params.openedSketches.map(({ sketchPath }) => sketchPath)
+    );
+    if (distinctSketchPaths.size !== params.openedSketches.length) {
+      throw new Error(
+        `Illegal argument. Sketch paths must be unique: ${JSON.stringify(
+          params
+        )}`
+      );
+    }
     if (
       !params.addedPaths.every((sketchPath) =>
         isOpenedSketch(sketchPath, params.openedSketches)
@@ -189,14 +200,14 @@ export function createArduinoContext(
       !params.removedPaths.every((sketchPath) => isOpenedSketch(sketchPath))
     ) {
       throw new Error(
-        `Removed sketch folder was not opened: ${JSON.stringify(
+        `Illegal state update. Removed sketch folder was not opened: ${JSON.stringify(
           params
         )}, opened sketches: ${JSON.stringify(_openedSketches)}`
       );
     }
     if (params.addedPaths.some((sketchPath) => isOpenedSketch(sketchPath))) {
       throw new Error(
-        `Added sketch folder was already opened: ${JSON.stringify(
+        `Illegal state update. Added sketch folder was already opened: ${JSON.stringify(
           params
         )}, opened sketches: ${JSON.stringify(_openedSketches)}`
       );
@@ -207,8 +218,9 @@ export function createArduinoContext(
       removedPaths: params.removedPaths,
     });
   };
-  const updateCurrentSketch = (params: UpdateCurrentSketchParams) => {
+  const updateCurrentSketch = async (params: UpdateCurrentSketchParams) => {
     assertIsOpened(params.currentSketch);
+    await update('sketchPath', params.currentSketch?.sketchPath);
     _currentSketch = params.currentSketch;
     _onDidChangeCurrentSketch.fire(_currentSketch);
   };
@@ -315,11 +327,8 @@ export function createArduinoContext(
       return _openedSketches;
     },
     update: async function (args: unknown) {
-      if (isUpdateStateParams(args)) {
-        // TODO: should be removed
-        const { key, value } = args;
-        return update(key, value);
-      } else if (isUpdateCliConfigParams(args)) {
+      assertNotDisposed();
+      if (isUpdateCliConfigParams(args)) {
         return updateCliConfig(args);
       } else if (isUpdateCurrentSketchParams(args)) {
         return updateCurrentSketch(args);
@@ -332,7 +341,7 @@ export function createArduinoContext(
         try {
           invalidParams = JSON.stringify(args);
         } catch {}
-        throw new Error(`Invalid state update: ${invalidParams}`);
+        throw new Error(`Invalid params: ${invalidParams}`);
       }
     },
   };
@@ -346,8 +355,6 @@ function deepStrictEqual(left: unknown, right: unknown): boolean {
     return false;
   }
 }
-
-// export function isChangeEvent<T>(arg: unknown): arg is ChangeEvent<T> {}
 
 function createOnDidChange(
   emitters: ReturnType<typeof createEmitters>
@@ -388,13 +395,6 @@ async function updateState(
 }
 
 const updateStateCommandId = 'arduinoAPI.updateState';
-/**
- * @deprecated
- */
-interface UpdateStateParams {
-  readonly key: keyof ArduinoState;
-  readonly value: ArduinoState[keyof ArduinoState];
-}
 
 type UpdateCliConfigParams = ChangeEvent<CliConfig>;
 
@@ -503,6 +503,7 @@ function isUpdateSketchFoldersParams(
   );
 }
 
+/** @deprecated will be removed */
 const noopArduinoState: ArduinoState = {
   sketchPath: undefined,
   compileSummary: undefined,
@@ -512,24 +513,10 @@ const noopArduinoState: ArduinoState = {
   userDirPath: undefined,
   dataDirPath: undefined,
 } as const;
+/** @deprecated will be removed */
 const arduinoStateKeys = Object.keys(
   noopArduinoState
 ) as (keyof ArduinoState)[];
-
-/**
- * @deprecated will be removed
- */
-function isUpdateStateParams(arg: unknown): arg is UpdateStateParams {
-  if (typeof arg === 'object') {
-    return (
-      (<UpdateStateParams>arg).key !== undefined &&
-      typeof (<UpdateStateParams>arg).key === 'string' &&
-      arduinoStateKeys.includes((<UpdateStateParams>arg).key) &&
-      'value' in <UpdateStateParams>arg // TODO: assert value correctness
-    );
-  }
-  return false;
-}
 
 const configKeys = ['log', 'compareBeforeUpdate'] as const;
 type ConfigKey = (typeof configKeys)[number];
@@ -549,13 +536,11 @@ function getWorkspaceConfig<T>(configKey: ConfigKey): T {
  * (non-API)
  */
 export const __test = {
-  updateStateCommandId,
   defaultConfigValues,
   getWorkspaceConfig,
   isCliConfig,
   isSketchFolder,
-  isUpdateCliConfigParams,
-  isUpdateCurrentSketchParams,
   isUpdateSketchFoldersParams,
   isUpdateSketchParams,
+  isBoardDetails,
 } as const;

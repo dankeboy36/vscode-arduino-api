@@ -20,7 +20,7 @@
       ],
       "env": {
         "NO_TEST_TIMEOUT": "true",
-        "NO_TEST_COVERAGE": "true",
+        "NO_TEST_COVERAGE": "true"
       },
       "outFiles": [
         "${workspaceFolder}/out/**/*.js",

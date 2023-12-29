@@ -143,7 +143,7 @@ export interface ArduinoContext extends ArduinoState {
   readonly currentSketch: SketchFolder | undefined;
 
   /**
-   * An {@link Event} which fires when the {@link currentSketch current sketch} has changed.
+   * An {@link Event} that is emitted when the {@link currentSketch current sketch} has changed.
    * *Note* that the event also fires when the active editor changes to `undefined`.
    */
   readonly onDidChangeCurrentSketch: Event<SketchFolder | undefined>;

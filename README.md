@@ -10,17 +10,31 @@ This VS Code extension does not provide any functionality but a bridge between t
 
 ## API
 
-Exposes the Arduino state for VS Code extensions:
+### Variables
 
-| Name             | Description                                                                                                                                                                                                                                                                                                                          | Type                                                                      |    Note     |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | :---------: |
-| `sketchPath`     | Absolute filesystem path of the sketch folder.                                                                                                                                                                                                                                                                                       | `string`                                                                  |
-| `compileSummary` | The summary of the latest sketch compilation. When the `sketchPath` is available, but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.                                                                                                                                                               | `CompileSummary`                                                          | ⚠️ `@alpha` |
-| `fqbn`           | The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.                                                                                                                                                                                                                                            | `string`                                                                  |
-| `boardDetails`   | Lightweight representation of the board's detail. This information is [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the currently selected board. It can be `undefined` if the `fqbn` is defined, but the platform is not installed. | `BoardDetails`                                                            | ⚠️ `@alpha` |
-| `port`           | The currently selected port in the Arduino IDE.                                                                                                                                                                                                                                                                                      | [`Port`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#port) |
-| `userDirPath`    | Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.                                                                                                                                                                   | `string`                                                                  | ⚠️ `@alpha` |
-| `dataDirPath`    | Filesystem path to the [`directories.data`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location                                                                                                                                                                                                 | `string`                                                                  | ⚠️ `@alpha` |
+| Name             | Description                                                                                                                                                                           | Type                        |    Note     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | :---------: |
+| `openedSketches` | All opened sketch folders in the window.                                                                                                                                              | `SketchFolder[]`            | ⚠️ `@alpha` |
+| `currentSketch`  | The currently active sketch (folder) or `undefined`. The current sketch is the one that currently has focus or most recently had focus. The current sketch is in the opened sketches. | `SketchFolder \| undefined` | ⚠️ `@alpha` |
+| `config`         | The currently configured Arduino CLI configuration.                                                                                                                                   | `CliConfig`                 | ⚠️ `@alpha` |
+
+### Events
+
+| Name                       | Description                                                                                                                                   | Type                                                  |    Note     |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | :---------: |
+| `onDidChangeCurrentSketch` | An event that is emitted when the current sketch has changed. _Note_ that the event also fires when the active editor changes to `undefined`. | `Event<{ currentSketch: SketchFolder \| undefined }>` | ⚠️ `@alpha` |
+| `onDidChangeSketchFolders` | An event that is emitted when sketch folders are added or removed.                                                                            | `Event<SketchFoldersChangeEvent>`                     | ⚠️ `@alpha` |
+| `onDidChangeSketch`        | An event that is emitted when the selected board, port, etc., has changed in the sketch folder.                                               | `Event<ChangeEvent<SketchFolder>>`                    | ⚠️ `@alpha` |
+| `onDidChangeConfig`        | An event that is emitter when the sketchbook (`directories.data`) or the data directory (`directories.data`) path has changed.                | `Event<ChangeEvent<CliConfig>>`                       | ⚠️ `@alpha` |
+
+### `SketchFolder``
+
+| Name             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Type                                                                      |    Note     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | :---------: |
+| `sketchPath`     | Absolute filesystem path of the sketch folder.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `string`                                                                  | ⚠️ `@alpha` |
+| `compileSummary` | The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the compile summary can be `undefined`.                                                                                                                                                                                                                                                                                                                                                                                           | `CompileSummary`                                                          | ⚠️ `@alpha` |
+| `board`          | The currently selected board associated with the sketch. If the `board` is undefined, no board is selected. If the `board` is a `BoardIdentifier`, it could be a recognized board on a detected port, but the board's platform could be absent. If platform is installed, the `board` is the lightweight representation of the board's detail. This information is [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the currently selected board in the sketch folder. | `string`                                                                  | ⚠️ `@alpha` |
+| `port`           | The currently selected port in the sketch folder.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | [`Port`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#port) | ⚠️ `@alpha` |
 
 ## How to Use
 
@@ -41,10 +55,10 @@ If you want to use the Arduino APIs, you have to do the followings:
     import type { ArduinoContext } from 'vscode-arduino-api';
 
     export function activate(context: vscode.ExtensionContext) {
-      const arduinoContext: ArduinoContext = vscode.extensions.getExtension(
+      const context: ArduinoContext = vscode.extensions.getExtension(
         'dankeboy36.vscode-arduino-api'
       )?.exports;
-      if (!arduinoContext) {
+      if (!context) {
         // Failed to load the Arduino API.
         return;
       }
@@ -63,11 +77,13 @@ If you want to use the Arduino APIs, you have to do the followings:
 
       // Listen on state change.
       // Register a listener to show the FQBN of the currently selected board as an information message.
-      context.subscriptions.push(
-        arduinoContext.onDidChange('fqbn')((fqbn) =>
-          vscode.window.showInformationMessage(`FQBN: ${fqbn}`)
-        )
-      );
+      context.onDidChangeSketch((event) => {
+        if (event.changedProperties.includes('board')) {
+          vscode.window.showInformationMessage(
+            `FQBN: ${event.object.board?.fqbn}`
+          );
+        }
+      });
     }
     ```
 
@@ -93,4 +109,4 @@ This extension contributes the following settings:
 ---
 
 - Q: Are there any dependent examples?
-- A: Yes, for example, [dankeboy36/esp-exception-decoder](https://github.com/dankeboy36/esp-exception-decoder).
+- A: Yes, for example, [dankeboy36/esp-exception-decoder](https://github.com/dankeboy36/esp-exception-decoder) or [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).

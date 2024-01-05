@@ -17,7 +17,7 @@ The current state in the sketch folder. For example, the FQBN of the selected bo
 
 ### board
 
-• `Readonly` **board**: `undefined` \| [`BoardIdentifier`](../modules.md#boardidentifier) \| [`BoardDetails`](BoardDetails.md)
+• `Readonly` **board**: `undefined` \| [`BoardIdentifier`](../README.md#boardidentifier) \| [`BoardDetails`](BoardDetails.md)
 
 The currently selected board associated with the sketch. If the `board` is undefined, no board is selected.
 If the `board` is a `BoardIdentifier`, it could be a recognized board on a detected port, but the board's platform could be absent.

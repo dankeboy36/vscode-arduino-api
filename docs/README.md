@@ -24,17 +24,17 @@
 
 ### Type Aliases
 
-- [BoardIdentifier](modules.md#boardidentifier)
-- [BuildProperties](modules.md#buildproperties)
-- [Tool](modules.md#tool)
-- [Version](modules.md#version)
+- [BoardIdentifier](README.md#boardidentifier)
+- [BuildProperties](README.md#buildproperties)
+- [Tool](README.md#tool)
+- [Version](README.md#version)
 
 ### Variables
 
-- [ConfigOption](modules.md#configoption)
-- [ConfigValue](modules.md#configvalue)
-- [Port](modules.md#port)
-- [Programmer](modules.md#programmer)
+- [ConfigOption](README.md#configoption)
+- [ConfigValue](README.md#configvalue)
+- [Port](README.md#port)
+- [Programmer](README.md#programmer)
 
 ## Type Aliases
 

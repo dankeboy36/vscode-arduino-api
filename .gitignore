@@ -6,4 +6,3 @@ node_modules
 src/test/test-workspace/*
 !src/test/test-workspace/.gitkeep
 .nyc_output
-docs/README.md

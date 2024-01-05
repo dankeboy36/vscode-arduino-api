@@ -10,9 +10,7 @@ This VS Code extension does not provide any functionality but a bridge between t
 
 ## API
 
-### [`ArduinoContext`](./docs/interfaces/ArduinoContext.md)
-
-### [`SketchFolder`](./docs/interfaces/SketchFolder.md)
+[See](https://github.com/dankeboy36/vscode-arduino-api/blob/main/docs/README.md) the full API on GitHub.
 
 ## How to Use
 

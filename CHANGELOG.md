@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.0...0.2.1) (2024-01-05)
+
+
+### Bug Fixes
+
+* expose `selectedProgrammer` + `configOptions` ([#14](https://github.com/dankeboy36/vscode-arduino-api/issues/14)) ([25ab1d4](https://github.com/dankeboy36/vscode-arduino-api/commit/25ab1d46d56e8dd23ac96db93dafd427c04a0a23)), closes [#13](https://github.com/dankeboy36/vscode-arduino-api/issues/13)
+
 # [0.2.0](https://github.com/dankeboy36/vscode-arduino-api/compare/0.1.2...0.2.0) (2023-12-29)
 
 

@@ -8,10 +8,10 @@ src/**
 .prettierignore
 CHANGELOG.md
 webpack.config.js
-vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
 **/*.ts
 release.config.js
 .nyc_output/**
+docs/**

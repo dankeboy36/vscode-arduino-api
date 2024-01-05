@@ -1,4 +1,8 @@
-import { isBoardIdentifier } from 'boards-list';
+import {
+  PortIdentifier,
+  isBoardIdentifier,
+  isPortIdentifier,
+} from 'boards-list';
 import assert from 'node:assert/strict';
 import vscode from 'vscode';
 import type {
@@ -7,15 +11,14 @@ import type {
   BoardDetails,
   ChangeEvent,
   CliConfig,
-  CompileSummary,
   Port,
+  Programmer,
   SketchFolder,
   SketchFoldersChangeEvent,
 } from './api';
 
 export function activateArduinoContext(
   context: Pick<vscode.ExtensionContext, 'subscriptions'>,
-  state: vscode.Memento,
   outputChannelFactory: () => vscode.OutputChannel
 ): ReturnType<typeof createArduinoContext> {
   // config
@@ -40,7 +43,6 @@ export function activateArduinoContext(
 
   const options = {
     debug,
-    state,
     compareBeforeUpdate() {
       return compareBeforeUpdate;
     },
@@ -66,15 +68,12 @@ export function activateArduinoContext(
 interface CreateOptions {
   debug(message: string): void;
   compareBeforeUpdate(): boolean;
-  readonly state: vscode.Memento;
 }
 
 export function createArduinoContext(
   options: CreateOptions
-): ArduinoContext &
-  vscode.Disposable & { update(args: unknown): Promise<unknown> } {
-  const { debug, state } = options;
-
+): ArduinoContext & vscode.Disposable & { update(args: unknown): unknown } {
+  const { debug } = options;
   // events
   let disposed = false;
   const _onDidChangeCurrentSketch = new vscode.EventEmitter<
@@ -102,10 +101,6 @@ export function createArduinoContext(
     if (disposed) {
       throw new Error('Disposed');
     }
-  };
-  const get = <T>(key: keyof ArduinoState) => {
-    assertNotDisposed();
-    return <T>getState(state, key);
   };
   const hasChanged = <T>(event: ChangeEvent<T>, currentObject: T | undefined) =>
     event.changedProperties.some((property) => {
@@ -137,18 +132,19 @@ export function createArduinoContext(
 
   let _cliConfig: CliConfig | undefined = undefined;
   let _currentSketch: SketchFolder | undefined = undefined;
-  const updateCliConfig = async (params: UpdateCliConfigParams) => {
+  const updateCliConfig = (params: UpdateCliConfigParams) => {
     const changed =
       !options.compareBeforeUpdate() || hasChanged(params, _cliConfig);
     if (changed) {
-      // TODO: remove old notifications
-      await Promise.all(
-        params.changedProperties.map((property) =>
-          update(property, params.object[property])
-        )
-      );
-
+      // update value
       _cliConfig = params.object;
+
+      // TODO: remove old notifications
+      // emit deprecated events
+      for (const property of params.changedProperties) {
+        emitDeprecatedEvent(property, params.object[property]);
+      }
+      // emit new API events
       _onDidChangeConfig.fire(params);
     }
   };
@@ -218,65 +214,72 @@ export function createArduinoContext(
       removedPaths: params.removedPaths,
     });
   };
-  const updateCurrentSketch = async (params: UpdateCurrentSketchParams) => {
+  const updateCurrentSketch = (params: UpdateCurrentSketchParams) => {
     assertIsOpened(params.currentSketch);
-    await update('sketchPath', params.currentSketch?.sketchPath);
+    emitDeprecatedEvent('sketchPath', params.currentSketch?.sketchPath);
     _currentSketch = params.currentSketch;
     _onDidChangeCurrentSketch.fire(_currentSketch);
   };
-  const updateSketch = async (params: UpdateSketchParam) => {
+  const updateSketch = (params: UpdateSketchParam) => {
     assertIsOpened(params.object);
     const changed =
       !options.compareBeforeUpdate() || hasChanged(params, _currentSketch);
     if (changed) {
-      // TODO: remove old notifications
-      await Promise.all(
-        params.changedProperties.map((property) => {
-          // backward compatibility between board vs. fqbn+boardDetails
-          if (property === 'board') {
-            const newValue = params.object[property];
-            if (!newValue) {
-              return Promise.all([
-                update('fqbn', undefined),
-                update('boardDetails', undefined),
-              ]);
-            } else if (isBoardDetails(newValue)) {
-              return Promise.all([
-                update('fqbn', newValue.fqbn),
-                update('boardDetails', newValue),
-              ]);
-            } else {
-              return Promise.all([
-                update('fqbn', newValue.fqbn),
-                update('boardDetails', undefined),
-              ]);
-            }
-          }
-          return update(property, params.object[property]);
-        })
-      );
-
+      // set value
       _currentSketch = params.object;
+
+      // emit deprecated events
+      // TODO: remove old notifications
+      for (const property of params.changedProperties) {
+        if (property === 'selectedProgrammer' || property === 'configOptions') {
+          // https://github.com/dankeboy36/vscode-arduino-api/issues/13
+          // new properties are not required for old APIs
+          continue;
+        }
+
+        // backward compatibility between board vs. fqbn+boardDetails
+        if (property === 'board') {
+          const newValue = params.object[property];
+          if (!newValue) {
+            emitDeprecatedEvent('fqbn', undefined);
+            emitDeprecatedEvent('boardDetails', undefined);
+          } else if (isBoardDetails(newValue)) {
+            emitDeprecatedEvent('fqbn', newValue.fqbn);
+            emitDeprecatedEvent('boardDetails', newValue);
+          } else {
+            emitDeprecatedEvent('fqbn', newValue.fqbn);
+            emitDeprecatedEvent('boardDetails', undefined);
+          }
+          continue;
+        }
+
+        if (property === 'port') {
+          const port = params.object.port;
+          // https://github.com/dankeboy36/vscode-arduino-api/issues/13
+          // if the new port value is set but not a complete detected port object, skip the update
+          if (!port || isDetectedPort(port)) {
+            emitDeprecatedEvent(property, port);
+          } else {
+            emitDeprecatedEvent('port', undefined);
+          }
+        } else {
+          emitDeprecatedEvent(property, params.object[property]);
+        }
+      }
+
+      // emit new events
       _onDidChangeSketch.fire(params);
     }
   };
 
   /** @deprecated will be removed */
-  const update = async (
+  const emitDeprecatedEvent = (
     key: keyof ArduinoState,
-    value: ArduinoState[keyof ArduinoState]
+    newValue: ArduinoState[keyof ArduinoState]
   ) => {
     assertNotDisposed();
-    if (options.compareBeforeUpdate()) {
-      const currentValue = get(key);
-      try {
-        assert.deepStrictEqual(currentValue, value);
-        return;
-      } catch {}
-    }
-    await updateState(state, key, value);
-    debug(`Updated '${key}': ${JSON.stringify(value)}`);
-    emitters[key].fire(value);
+    debug(`Updated '${key}': ${JSON.stringify(newValue)}`);
+    emitters[key].fire(newValue);
   };
 
   // context
@@ -285,25 +288,33 @@ export function createArduinoContext(
       return onDidChange[property] as vscode.Event<ArduinoState[T]>;
     },
     get sketchPath() {
-      return get<string>('sketchPath');
+      return _currentSketch?.sketchPath;
     },
     get compileSummary() {
-      return get<CompileSummary>('compileSummary');
+      return _currentSketch?.compileSummary;
     },
     get fqbn() {
-      return get<string>('fqbn');
+      return _currentSketch?.board?.fqbn;
     },
     get boardDetails() {
-      return get<BoardDetails>('boardDetails');
+      const board = _currentSketch?.board;
+      if (board && !isBoardDetails(board)) {
+        return undefined;
+      }
+      return board;
     },
     get port() {
-      return get<Port>('port');
+      const port = _currentSketch?.port;
+      if (port && !isDetectedPort(port)) {
+        return undefined;
+      }
+      return port;
     },
     get userDirPath() {
-      return get<string>('userDirPath');
+      return _cliConfig?.userDirPath;
     },
     get dataDirPath() {
-      return get<string>('dataDirPath');
+      return _cliConfig?.dataDirPath;
     },
     dispose(): void {
       if (disposed) {
@@ -326,7 +337,7 @@ export function createArduinoContext(
     get openedSketches() {
       return _openedSketches;
     },
-    update: async function (args: unknown) {
+    update: function (args: unknown) {
       assertNotDisposed();
       if (isUpdateCliConfigParams(args)) {
         return updateCliConfig(args);
@@ -379,21 +390,6 @@ function createEmitters(): Record<
   }, <Record<keyof ArduinoState, vscode.EventEmitter<ArduinoState[keyof ArduinoState]>>>{});
 }
 
-function getState<T>(
-  state: vscode.Memento,
-  key: keyof ArduinoContext
-): T | undefined {
-  return state.get<T>(key);
-}
-
-async function updateState(
-  state: vscode.Memento,
-  key: keyof ArduinoState,
-  value: ArduinoState[keyof ArduinoState]
-): Promise<void> {
-  return state.update(key, value);
-}
-
 type UpdateCliConfigParams = ChangeEvent<CliConfig>;
 
 function isCliConfig(arg: unknown): arg is CliConfig {
@@ -437,8 +433,29 @@ function isSketchFolder(arg: unknown): arg is SketchFolder {
       typeof (<SketchFolder>arg).compileSummary === 'object') &&
     'port' in arg &&
     ((<SketchFolder>arg).port === undefined ||
-      typeof (<SketchFolder>arg).port === 'object')
+      typeof (<SketchFolder>arg).port === 'object') &&
+    'selectedProgrammer' in arg &&
+    ((<SketchFolder>arg).selectedProgrammer === undefined ||
+      typeof (<SketchFolder>arg).selectedProgrammer === 'string' ||
+      isProgrammer((<SketchFolder>arg).selectedProgrammer)) &&
+    'configOptions' in arg &&
+    ((<SketchFolder>arg).configOptions === undefined ||
+      typeof (<SketchFolder>arg).configOptions === 'string')
   );
+}
+
+function isProgrammer(arg: unknown): arg is Programmer {
+  return (
+    typeof arg === 'object' &&
+    arg !== null &&
+    typeof (<Programmer>arg).id === 'string' &&
+    typeof (<Programmer>arg).name === 'string' &&
+    typeof (<Programmer>arg).platform === 'string'
+  );
+}
+
+function isDetectedPort(port: PortIdentifier | Port): port is Port {
+  return isPortIdentifier(port) && typeof (<Port>port).label === 'string';
 }
 
 function isBoardDetails(arg: unknown): arg is BoardDetails {

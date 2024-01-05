@@ -9,6 +9,7 @@ import type {
   CliConfig,
   CompileSummary,
   Port,
+  Programmer,
   SketchFolder,
   SketchFoldersChangeEvent,
 } from '../../api';
@@ -17,7 +18,6 @@ import {
   activateArduinoContext,
   createArduinoContext,
 } from '../../arduinoContext';
-import { InmemoryState } from '../../inmemoryState';
 
 const {
   defaultConfigValues,
@@ -40,20 +40,24 @@ const port: Port = {
   },
   hardwareId: '1730323',
 };
+
+const programmer: Programmer = {
+  id: 'p1',
+  name: 'P1 Programmer',
+  platform: 'my platform',
+};
+
 const boardDetails: BoardDetails = {
   configOptions: [],
   fqbn: 'a:b:c',
   name: 'ABC',
-  programmers: [
-    { id: 'one', name: 'one', platform: 'one' },
-    { id: 'two', name: 'two', platform: 'two' },
-  ],
+  programmers: [programmer, { id: 'two', name: 'two', platform: 'two' }],
   toolsDependencies: [
     { name: 'a', packager: 'a', version: '1' },
     { name: 'b', packager: 'b', version: '2' },
   ],
   buildProperties: { 'build.tarch': 'xtensa', x: 'y' },
-  defaultProgrammerId: 'two',
+  defaultProgrammerId: programmer.id,
 };
 
 const compileSummary: CompileSummary = {
@@ -70,6 +74,8 @@ const sketchFolder: SketchFolder = {
   compileSummary,
   port,
   sketchPath: '/path/to/sketchbook/my_sketch',
+  selectedProgrammer: programmer,
+  configOptions: 'a:b:c:opt_1=value1,opt_2=value2',
 };
 
 const initSketchFoldersChangeEvent: SketchFoldersChangeEvent &
@@ -228,13 +234,12 @@ describe('arduinoContext', () => {
         const copy: Record<string, unknown> = {
           ...sketchFolder,
         };
-        if (typeof copy[property] === 'string') {
+        if ((property as keyof SketchFolder) === 'selectedProgrammer') {
+          copy[property] = 36; // selectedProgrammer can be object and string
+        } else if (typeof copy[property] === 'string') {
           copy[property] = { alma: 'korte' };
         } else {
           copy[property] = 'alma';
-        }
-        if (property === 'board') {
-          console.log();
         }
         assert.strictEqual(isSketchFolder(copy), false);
       })
@@ -253,17 +258,17 @@ describe('arduinoContext', () => {
       assert.ok(typeof context.update === 'function');
     });
 
-    it('should update the data directory path', async () => {
+    it('should update the data directory path', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       assert.strictEqual(context.dataDirPath, undefined);
       assert.strictEqual(context.config.dataDirPath, undefined);
 
-      const config: CliConfig = {
+      const config = {
         dataDirPath: '/path/to/data/dir',
         userDirPath: undefined,
       };
-      const event: ChangeEvent<CliConfig> = {
+      const event = {
         changedProperties: ['dataDirPath'],
         object: config,
       };
@@ -281,7 +286,7 @@ describe('arduinoContext', () => {
         )
       );
 
-      await context.update(event);
+      context.update(event);
       assert.strictEqual(context.dataDirPath, '/path/to/data/dir');
       assert.strictEqual(context.userDirPath, undefined);
       assert.strictEqual(context.config.dataDirPath, '/path/to/data/dir');
@@ -289,17 +294,17 @@ describe('arduinoContext', () => {
       assert.deepStrictEqual(events, ['deprecated-dataDirPath', 'dataDirPath']);
     });
 
-    it('should update the user directory path', async () => {
+    it('should update the user directory path', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       assert.strictEqual(context.userDirPath, undefined);
       assert.strictEqual(context.config.userDirPath, undefined);
 
-      const config: CliConfig = {
+      const config = {
         dataDirPath: undefined,
         userDirPath: '/path/to/sketchbook',
       };
-      const event: ChangeEvent<CliConfig> = {
+      const event = {
         changedProperties: ['userDirPath'],
         object: config,
       };
@@ -317,7 +322,7 @@ describe('arduinoContext', () => {
         )
       );
 
-      await context.update(event);
+      context.update(event);
       assert.strictEqual(context.dataDirPath, undefined);
       assert.strictEqual(context.userDirPath, '/path/to/sketchbook');
       assert.strictEqual(context.config.dataDirPath, undefined);
@@ -325,7 +330,7 @@ describe('arduinoContext', () => {
       assert.deepStrictEqual(events, ['deprecated-userDirPath', 'userDirPath']);
     });
 
-    it('should update data and the user directory paths', async () => {
+    it('should update data and the user directory paths', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       assert.strictEqual(context.dataDirPath, undefined);
@@ -333,11 +338,11 @@ describe('arduinoContext', () => {
       assert.strictEqual(context.userDirPath, undefined);
       assert.strictEqual(context.config.userDirPath, undefined);
 
-      const config: CliConfig = {
+      const config = {
         dataDirPath: '/path/to/data/dir',
         userDirPath: '/path/to/sketchbook',
       };
-      const event: ChangeEvent<CliConfig> = {
+      const event = {
         changedProperties: ['userDirPath', 'dataDirPath'],
         object: config,
       };
@@ -355,7 +360,7 @@ describe('arduinoContext', () => {
         )
       );
 
-      await context.update(event);
+      context.update(event);
       assert.strictEqual(context.dataDirPath, '/path/to/data/dir');
       assert.strictEqual(context.userDirPath, '/path/to/sketchbook');
       assert.strictEqual(context.config.dataDirPath, '/path/to/data/dir');
@@ -368,7 +373,7 @@ describe('arduinoContext', () => {
       ]);
     });
 
-    it("should not update when 'compareBeforeUpdate' is true and values are the same", async () => {
+    it("should not update when 'compareBeforeUpdate' is true and values are the same", () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       assert.strictEqual(context.dataDirPath, undefined);
@@ -382,7 +387,7 @@ describe('arduinoContext', () => {
         changedProperties: ['dataDirPath'],
         object: config,
       };
-      await context.update(event);
+      context.update(event);
       assert.strictEqual(context.dataDirPath, '/path/to/data/dir');
       assert.strictEqual(context.config.dataDirPath, '/path/to/data/dir');
 
@@ -396,22 +401,22 @@ describe('arduinoContext', () => {
         )
       );
 
-      await context.update(event);
+      context.update(event);
       assert.strictEqual(context.dataDirPath, '/path/to/data/dir');
       assert.strictEqual(context.config.dataDirPath, '/path/to/data/dir');
       assert.deepStrictEqual(events, []);
     });
 
-    it('should error when updating the current sketch but is not opened', async () => {
+    it('should error when updating the current sketch but is not opened', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
-      await assert.rejects(
-        context.update({ currentSketch: sketchFolder }),
+      assert.throws(
+        () => context.update({ currentSketch: sketchFolder }),
         /Error: Illegal state. Sketch is not opened/
       );
     });
 
-    it('should error when updating sketch folders with invalid params (added/remove must be distinct)', async () => {
+    it('should error when updating sketch folders with invalid params (added/remove must be distinct)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const params = {
@@ -419,13 +424,13 @@ describe('arduinoContext', () => {
         openedSketches: [],
         removedPaths: ['path'],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal argument. Added\/removed paths must be distinct/
       );
     });
 
-    it('should error when updating sketch folders with invalid params (sketch paths must be unique)', async () => {
+    it('should error when updating sketch folders with invalid params (sketch paths must be unique)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const params = {
@@ -433,13 +438,13 @@ describe('arduinoContext', () => {
         openedSketches: [sketchFolder, sketchFolder],
         removedPaths: [],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal argument. Sketch paths must be unique/
       );
     });
 
-    it('should error when updating sketch folders with invalid params (added path is not in new opened)', async () => {
+    it('should error when updating sketch folders with invalid params (added path is not in new opened)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const params = {
@@ -447,13 +452,13 @@ describe('arduinoContext', () => {
         openedSketches: [],
         removedPaths: [],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal argument. Added path must be in opened sketches/
       );
     });
 
-    it('should error when updating sketch folders with invalid params (removed path is in new opened)', async () => {
+    it('should error when updating sketch folders with invalid params (removed path is in new opened)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const params = {
@@ -461,13 +466,13 @@ describe('arduinoContext', () => {
         openedSketches: [{ ...sketchFolder, sketchPath: 'path' }],
         removedPaths: ['path'],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal argument. Removed path must not be in opened sketches/
       );
     });
 
-    it('should error when updating sketch folders with invalid state (removed path is not in current opened)', async () => {
+    it('should error when updating sketch folders with invalid state (removed path is not in current opened)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const params = {
@@ -475,52 +480,58 @@ describe('arduinoContext', () => {
         openedSketches: [],
         removedPaths: ['path'],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal state update. Removed sketch folder was not opened/
       );
     });
 
-    it('should error when updating sketch folders with invalid state (added path is already in current opened)', async () => {
+    it('should error when updating sketch folders with invalid state (added path is already in current opened)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
-      await context.update(initSketchFoldersChangeEvent); // open a sketch folder
+      context.update(initSketchFoldersChangeEvent); // open a sketch folder
 
       const params = {
         addedPaths: [sketchFolder.sketchPath],
         openedSketches: [sketchFolder],
         removedPaths: [],
       };
-      await assert.rejects(
-        context.update(params),
+      assert.throws(
+        () => context.update(params),
         /Error: Illegal state update. Added sketch folder was already opened/
       );
     });
 
-    it('should error when updating with invalid params', async () => {
+    it('should error when updating with invalid params', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
-      await assert.rejects(
-        context.update({ manó: '♥' }),
+      assert.throws(
+        () => context.update({ manó: '♥' }),
         /Invalid params: {"manó":"♥"}/
       );
     });
 
-    it('should gracefully handle when updating with invalid params (non-JSON serializable)', async () => {
+    it('should gracefully handle when updating with invalid params (non-JSON serializable)', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       const circular = { b: 1, a: 0 };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (circular as any).circular = circular;
-      await assert.rejects(
-        context.update(circular),
+      assert.throws(
+        () => context.update(circular),
         /Invalid params: \[object Object\]/
       );
     });
 
-    interface UpdateSketchTestInput {
-      property: keyof SketchFolder;
-      value: SketchFolder[keyof SketchFolder];
+    interface UpdateSketchTestInput<
+      T extends keyof SketchFolder = keyof SketchFolder
+    > {
+      property: T;
+      inputValue: SketchFolder[T];
+      /**
+       * If not set, the `inputValue` is used as the expected. Use this while the deprecated APIs are in place.
+       */
+      expectedValue?: SketchFolder[T];
     }
     interface UpdateSketchTest {
       inputs: UpdateSketchTestInput[];
@@ -529,21 +540,32 @@ describe('arduinoContext', () => {
     }
     const updateTests: UpdateSketchTest[] = [
       {
-        inputs: [{ property: 'board', value: undefined }],
-        expectedEvents: [`sketch:${sketchFolder.sketchPath}:board`],
+        inputs: [{ property: 'board', inputValue: undefined }],
+        expectedEvents: [
+          'deprecated-fqbn',
+          'deprecated-boardDetails',
+          `sketch:${sketchFolder.sketchPath}:board`,
+        ],
         testNote: 'undefined',
       },
       {
         inputs: [
-          { property: 'board', value: { name: 'x:y:z', fqbn: undefined } },
+          { property: 'board', inputValue: { name: 'x:y:z', fqbn: undefined } },
         ],
-        expectedEvents: [`sketch:${sketchFolder.sketchPath}:board`],
+        expectedEvents: [
+          'deprecated-fqbn',
+          'deprecated-boardDetails',
+          `sketch:${sketchFolder.sketchPath}:board`,
+        ],
         testNote: 'absent fqbn',
       },
       {
-        inputs: [{ property: 'board', value: { name: 'XYZ', fqbn: 'x:y:z' } }],
+        inputs: [
+          { property: 'board', inputValue: { name: 'XYZ', fqbn: 'x:y:z' } },
+        ],
         expectedEvents: [
           'deprecated-fqbn',
+          'deprecated-boardDetails',
           `sketch:${sketchFolder.sketchPath}:board`,
         ],
         testNote: 'missing platform',
@@ -552,7 +574,7 @@ describe('arduinoContext', () => {
         inputs: [
           {
             property: 'board',
-            value: { ...boardDetails, name: 'XYZ', fqbn: 'x:y:z' },
+            inputValue: { ...boardDetails, name: 'XYZ', fqbn: 'x:y:z' },
           },
         ],
         expectedEvents: [
@@ -563,15 +585,18 @@ describe('arduinoContext', () => {
         testNote: 'complete details',
       },
       {
-        inputs: [{ property: 'compileSummary', value: undefined }],
-        expectedEvents: [`sketch:${sketchFolder.sketchPath}:compileSummary`],
+        inputs: [{ property: 'compileSummary', inputValue: undefined }],
+        expectedEvents: [
+          'deprecated-compileSummary',
+          `sketch:${sketchFolder.sketchPath}:compileSummary`,
+        ],
         testNote: 'undefined',
       },
       {
         inputs: [
           {
             property: 'compileSummary',
-            value: {
+            inputValue: {
               ...compileSummary,
               buildProperties: {
                 ...compileSummary.buildProperties,
@@ -586,15 +611,22 @@ describe('arduinoContext', () => {
         ],
       },
       {
-        inputs: [{ property: 'port', value: undefined }],
-        expectedEvents: [`sketch:${sketchFolder.sketchPath}:port`],
+        inputs: [{ property: 'port', inputValue: undefined }],
+        expectedEvents: [
+          'deprecated-port',
+          `sketch:${sketchFolder.sketchPath}:port`,
+        ],
         testNote: 'undefined',
       },
       {
         inputs: [
           {
             property: 'port',
-            value: { ...port, address: 'COM2', label: 'COM2 (Serial Port)' },
+            inputValue: {
+              ...port,
+              address: 'COM2',
+              label: 'COM2 (Serial Port)',
+            },
           },
         ],
         expectedEvents: [
@@ -602,14 +634,66 @@ describe('arduinoContext', () => {
           `sketch:${sketchFolder.sketchPath}:port`,
         ],
       },
+      {
+        inputs: [
+          {
+            property: 'port',
+            inputValue: { protocol: port.protocol, address: 'COM2' },
+            expectedValue: undefined,
+          },
+        ],
+        expectedEvents: [
+          'deprecated-port',
+          `sketch:${sketchFolder.sketchPath}:port`,
+        ],
+        testNote: '(port identifier is undefined via deprecated APIs)',
+      },
+      {
+        inputs: [
+          {
+            property: 'selectedProgrammer',
+            inputValue: 'p2',
+          },
+        ],
+        expectedEvents: [
+          `sketch:${sketchFolder.sketchPath}:selectedProgrammer`,
+        ],
+        testNote: 'string',
+      },
+      {
+        inputs: [
+          {
+            property: 'selectedProgrammer',
+            inputValue: {
+              id: 'xxxp',
+              name: 'XXX Programmer',
+              platform: 'my_platform',
+            },
+          },
+        ],
+        expectedEvents: [
+          `sketch:${sketchFolder.sketchPath}:selectedProgrammer`,
+        ],
+        testNote: 'object',
+      },
+      {
+        inputs: [
+          {
+            property: 'selectedProgrammer',
+            inputValue: undefined,
+          },
+        ],
+        expectedEvents: [
+          `sketch:${sketchFolder.sketchPath}:selectedProgrammer`,
+        ],
+        testNote: 'undefined',
+      },
     ];
 
     updateTests.map(({ inputs, expectedEvents, testNote }) =>
       it(`should update the ${inputs
         .map(({ property }) => `'${property}'`)
-        .join(', ')} of the sketch ${
-        testNote ? `(${testNote})` : ''
-      }`, async () => {
+        .join(', ')} of the sketch ${testNote ? `(${testNote})` : ''}`, () => {
         const events: string[] = [];
         const context = createArduinoContext(createOptions());
         toDispose.push(context);
@@ -619,6 +703,12 @@ describe('arduinoContext', () => {
         /** @deprecated will be removed */
         const deprecatedEvents: vscode.Disposable[] = [];
         for (const property of inputs.map(({ property }) => property)) {
+          if (
+            property === 'selectedProgrammer' ||
+            property === 'configOptions'
+          ) {
+            continue;
+          }
           // backward compatibility
           if (property === 'board') {
             deprecatedEvents.push(
@@ -651,38 +741,44 @@ describe('arduinoContext', () => {
         );
 
         // Open sketch folders
-        await context.update(initSketchFoldersChangeEvent);
+        context.update(initSketchFoldersChangeEvent);
         // Select the current one
-        await context.update({ currentSketch: sketchFolder });
+        context.update({ currentSketch: sketchFolder });
         assert.deepStrictEqual(context.currentSketch, sketchFolder);
         assert.deepStrictEqual(context.openedSketches, [sketchFolder]);
         assert.strictEqual(context.sketchPath, sketchFolder.sketchPath);
 
-        for (const { property, value } of inputs) {
-          assert.notDeepStrictEqual(context.currentSketch?.[property], value);
-
+        for (const input of inputs) {
+          const { property, inputValue } = input;
           const copy = { ...sketchFolder };
-          (copy as Record<string, unknown>)[property] = value;
+          (copy as Record<string, unknown>)[property] = inputValue;
           const params: ChangeEvent<SketchFolder> = {
             object: copy,
             changedProperties: [property],
           };
 
-          await context.update(params);
-          assert.deepStrictEqual(context.currentSketch?.[property], value);
+          context.update(params);
+          assert.deepStrictEqual(context.currentSketch?.[property], inputValue);
 
+          const expectedValue =
+            'expectedValue' in input ? input.expectedValue : inputValue;
           // to test backward compatibility
-          if (property === 'board') {
-            if (isBoardDetails(value)) {
-              assert.deepStrictEqual(context.boardDetails, value);
-            } else if (isBoardIdentifier(value)) {
-              assert.deepStrictEqual(context.fqbn, value.fqbn);
+          if (
+            property !== 'selectedProgrammer' &&
+            property !== 'configOptions'
+          ) {
+            if (property === 'board') {
+              if (isBoardDetails(expectedValue)) {
+                assert.deepStrictEqual(context.boardDetails, expectedValue);
+              } else if (isBoardIdentifier(expectedValue)) {
+                assert.deepStrictEqual(context.fqbn, expectedValue.fqbn);
+              } else {
+                assert.deepStrictEqual(context.fqbn, expectedValue);
+                assert.deepStrictEqual(context.boardDetails, expectedValue);
+              }
             } else {
-              assert.deepStrictEqual(context.fqbn, value);
-              assert.deepStrictEqual(context.boardDetails, value);
+              assert.deepStrictEqual(context[property], expectedValue);
             }
-          } else {
-            assert.deepStrictEqual(context[property], value);
           }
         }
 
@@ -753,22 +849,21 @@ describe('arduinoContext', () => {
 
       const context = activateArduinoContext(
         mockExtensionContext,
-        new InmemoryState(),
         mockOutputChannelFactory
       );
       toDispose.push(context, ...subscriptions);
 
       await updateWorkspaceConfig('log', false);
 
-      await context.update(initSketchFoldersChangeEvent);
-      await context.update({ currentSketch: sketchFolder });
+      context.update(initSketchFoldersChangeEvent);
+      context.update({ currentSketch: sketchFolder });
       assert.deepStrictEqual(context.currentSketch?.board, sketchFolder.board);
 
       let params: ChangeEvent<SketchFolder> = {
         object: { ...sketchFolder, board: { name: 'XYZ', fqbn: 'x:y:z' } },
         changedProperties: ['board'],
       };
-      await context.update(params);
+      context.update(params);
       assert.deepStrictEqual(context.currentSketch?.board, {
         name: 'XYZ',
         fqbn: 'x:y:z',
@@ -780,7 +875,7 @@ describe('arduinoContext', () => {
         object: { ...params.object, board: { name: 'QWE', fqbn: 'q:w:e' } },
         changedProperties: ['board'],
       };
-      await context.update(params);
+      context.update(params);
       assert.deepStrictEqual(context.currentSketch?.board, {
         name: 'QWE',
         fqbn: 'q:w:e',
@@ -811,15 +906,14 @@ describe('arduinoContext', () => {
 
       const context = activateArduinoContext(
         mockExtensionContext,
-        new InmemoryState(),
         mockOutputChannelFactory
       );
       toDispose.push(context, ...subscriptions);
 
       await updateWorkspaceConfig('compareBeforeUpdate', true);
 
-      await context.update(initSketchFoldersChangeEvent);
-      await context.update({ currentSketch: sketchFolder });
+      context.update(initSketchFoldersChangeEvent);
+      context.update({ currentSketch: sketchFolder });
       assert.deepStrictEqual(context.currentSketch?.board, sketchFolder.board);
 
       const events: string[] = [];
@@ -837,11 +931,11 @@ describe('arduinoContext', () => {
         object: sketchFolder,
         changedProperties: ['board'],
       };
-      await context.update(params);
+      context.update(params);
       assert.deepStrictEqual(events, []);
 
       await updateWorkspaceConfig('compareBeforeUpdate', false);
-      await context.update(params);
+      context.update(params);
       assert.deepStrictEqual(events, [
         'deprecated-fqbn',
         'deprecated-boardDetails',
@@ -860,13 +954,13 @@ describe('arduinoContext', () => {
   });
 
   describe('dispose', () => {
-    it('should error when updating after dispose', async () => {
+    it('should error when updating after dispose', () => {
       const context = createArduinoContext(createOptions());
       toDispose.push(context);
       context.dispose();
 
-      await assert.rejects(
-        context.update({ currentSketch: sketchFolder }),
+      assert.throws(
+        () => context.update({ currentSketch: sketchFolder }),
         /Disposed/
       );
     });
@@ -886,7 +980,6 @@ describe('arduinoContext', () => {
         /* NOOP */
       },
       compareBeforeUpdate: () => compare,
-      state: new InmemoryState(),
     };
   }
 });

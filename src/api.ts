@@ -7,7 +7,7 @@ import type {
   Programmer,
   ToolsDependencies,
 } from 'ardunno-cli';
-import type { BoardIdentifier } from 'boards-list';
+import type { BoardIdentifier, PortIdentifier } from 'boards-list';
 import type { Event } from 'vscode';
 
 /**
@@ -56,7 +56,19 @@ export interface SketchFolder {
    * The currently selected port in the sketch folder.
    * @alpha
    */
-  readonly port: Readonly<Port> | undefined;
+  readonly port: Readonly<Port> | PortIdentifier | undefined;
+
+  /**
+   * The currently selected programmer.
+   * @alpha
+   */
+  readonly selectedProgrammer: Readonly<Programmer> | string | undefined;
+
+  /**
+   * The FQBN with all the custom board options (if any) for the sketch. `a:b:c:opt1=value_1,opt2=value_2` means `{ "opt1": "value_1", "opt2": "value_2" }` config options are configured.
+   * @alpha
+   */
+  readonly configOptions: string | undefined;
 }
 
 /**

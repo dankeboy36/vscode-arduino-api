@@ -33,6 +33,8 @@
     "clean": "rimraf dist out *.vsix",
     "compile": "webpack && vsce package",
     "compile-tests": "tsc -p . --outDir out",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --readme none --hideBreadcrumbs true --disableSources --out docs ./src/api.ts",
+    "postdoc": "prettier --write ./docs",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts",
     "release": "semantic-release",
@@ -110,6 +112,8 @@
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.2",
+    "typedoc": "^0.25.6",
+    "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "^5.0.4",
     "webpack": "^5.81.0",
     "webpack-cli": "^5.0.2"

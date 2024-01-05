@@ -23,10 +23,6 @@ Describes a change event with the new state of the `object` and an array indicat
 
 An array properties that have changed in the `object`.
 
-#### Defined in
-
-[src/api.ts:202](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L202)
-
 ---
 
 ### object
@@ -34,7 +30,3 @@ An array properties that have changed in the `object`.
 • `Readonly` **object**: `T`
 
 The new state of the object
-
-#### Defined in
-
-[src/api.ts:198](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L198)

@@ -16,10 +16,6 @@
 
 Whether the configuration option is selected.
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:136
-
 ---
 
 ### value
@@ -28,10 +24,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:136
 
 The configuration option value.
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:132
-
 ---
 
 ### valueLabel
@@ -39,7 +31,3 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:132
 • **valueLabel**: `string`
 
 Label to identify the configuration option to humans.
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:134

@@ -31,10 +31,6 @@ The platform where the board is defined
 
 Readonly.boardPlatform
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/compile.d.ts:118
-
 ---
 
 ### buildPath
@@ -46,10 +42,6 @@ The compiler build path
 #### Inherited from
 
 Readonly.buildPath
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/compile.d.ts:112
 
 ---
 
@@ -63,19 +55,11 @@ The platform used for the build (if referenced from the board platform)
 
 Readonly.buildPlatform
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/compile.d.ts:120
-
 ---
 
 ### buildProperties
 
 • `Readonly` **buildProperties**: `Readonly`\<`Record`\<`string`, `string`\>\>
-
-#### Defined in
-
-[src/api.ts:253](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L253)
 
 ---
 
@@ -89,10 +73,6 @@ The size of the executable split by sections
 
 Readonly.executableSectionsSize
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/compile.d.ts:116
-
 ---
 
 ### usedLibraries
@@ -104,7 +84,3 @@ The libraries used in the build
 #### Inherited from
 
 Readonly.usedLibraries
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/compile.d.ts:114

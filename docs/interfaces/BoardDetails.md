@@ -26,10 +26,6 @@ The lightweight representation of all details of a particular board. See [`Board
 
 • `Readonly` **buildProperties**: `Readonly`\<`Record`\<`string`, `string`\>\>
 
-#### Defined in
-
-[src/api.ts:227](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L227)
-
 ---
 
 ### configOptions
@@ -41,10 +37,6 @@ The board's custom configuration options.
 #### Inherited from
 
 Readonly.configOptions
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:43
 
 ---
 
@@ -58,10 +50,6 @@ Default programmer for the board
 
 Readonly.defaultProgrammerId
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:51
-
 ---
 
 ### fqbn
@@ -73,10 +61,6 @@ The fully qualified board name of the board.
 #### Inherited from
 
 Readonly.fqbn
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:20
 
 ---
 
@@ -90,10 +74,6 @@ Name used to identify the board to humans (e.g., Arduino Uno).
 
 Readonly.name
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:22
-
 ---
 
 ### programmers
@@ -106,16 +86,8 @@ List of programmers supported by the board
 
 Readonly.programmers
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:45
-
 ---
 
 ### toolsDependencies
 
 • `Readonly` **toolsDependencies**: `Readonly`\<`Pick`\<`ToolsDependencies`, `"name"` \| `"version"` \| `"packager"`\>\>[]
-
-#### Defined in
-
-[src/api.ts:226](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L226)

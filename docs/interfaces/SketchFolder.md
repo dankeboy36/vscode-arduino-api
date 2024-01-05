@@ -25,10 +25,6 @@ If platform is installed, the `board` is the lightweight representation of the b
 [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
 for the currently selected board in the sketch folder.
 
-#### Defined in
-
-[src/api.ts:53](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L53)
-
 ---
 
 ### compileSummary
@@ -36,10 +32,6 @@ for the currently selected board in the sketch folder.
 • `Readonly` **compileSummary**: `undefined` \| [`CompileSummary`](CompileSummary.md)
 
 The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the compile summary can be `undefined`.
-
-#### Defined in
-
-[src/api.ts:43](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L43)
 
 ---
 
@@ -49,10 +41,6 @@ The summary of the latest sketch compilation. When the `sketchPath` is available
 
 The FQBN with all the custom board options (if any) for the sketch. `a:b:c:opt1=value_1,opt2=value_2` means `{ "opt1": "value_1", "opt2": "value_2" }` config options are configured.
 
-#### Defined in
-
-[src/api.ts:71](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L71)
-
 ---
 
 ### port
@@ -60,10 +48,6 @@ The FQBN with all the custom board options (if any) for the sketch. `a:b:c:opt1=
 • `Readonly` **port**: `undefined` \| `Readonly`\<`Pick`\<[`Port`](Port.md), `"address"` \| `"protocol"`\>\> \| `Readonly`\<[`Port`](Port.md)\>
 
 The currently selected port in the sketch folder.
-
-#### Defined in
-
-[src/api.ts:59](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L59)
 
 ---
 
@@ -73,10 +57,6 @@ The currently selected port in the sketch folder.
 
 The currently selected programmer.
 
-#### Defined in
-
-[src/api.ts:65](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L65)
-
 ---
 
 ### sketchPath
@@ -84,7 +64,3 @@ The currently selected programmer.
 • `Readonly` **sketchPath**: `string`
 
 Absolute filesystem path of the sketch folder.
-
-#### Defined in
-
-[src/api.ts:37](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L37)

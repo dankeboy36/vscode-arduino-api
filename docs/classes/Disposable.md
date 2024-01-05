@@ -35,10 +35,6 @@ _Note_ that an asynchronous function is not awaited.
 
 [`Disposable`](Disposable.md)
 
-#### Defined in
-
-node_modules/@types/vscode/index.d.ts:1578
-
 ## Methods
 
 ### dispose
@@ -50,10 +46,6 @@ Dispose this object.
 #### Returns
 
 `any`
-
-#### Defined in
-
-node_modules/@types/vscode/index.d.ts:1583
 
 ---
 
@@ -76,7 +68,3 @@ a dispose function which aren't instances of `Disposable`.
 
 Returns a new disposable which, upon dispose, will
 dispose all provided disposables.
-
-#### Defined in
-
-node_modules/@types/vscode/index.d.ts:1568

@@ -16,10 +16,6 @@
 
 Programmer ID
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:53
-
 ---
 
 ### name
@@ -28,10 +24,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:53
 
 Programmer name
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:55
-
 ---
 
 ### platform
@@ -39,7 +31,3 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:55
 • **platform**: `string`
 
 Platform name
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:51

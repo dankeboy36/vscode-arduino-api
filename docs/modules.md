@@ -47,10 +47,6 @@ Lightweight information to identify a board:
 - The board's `name` is to provide a fallback for the UI. Preferably do not use this property for any sophisticated logic and board comparison. It must never participate in the board's identification.
 - The FQBN might contain boards config options if selected from the discovered ports (see [arduino/arduino-ide#1588](https://github.com/arduino/arduino-ide/issues/1588)).
 
-#### Defined in
-
-node_modules/boards-list/dist/api.d.ts:7
-
 ---
 
 ### BuildProperties
@@ -58,10 +54,6 @@ node_modules/boards-list/dist/api.d.ts:7
 Ƭ **BuildProperties**: `Readonly`\<`Record`\<`string`, `string`\>\>
 
 Build properties used for compiling. The board-specific properties are retrieved from `board.txt` and `platform.txt`. For example, if the `board.txt` contains the `build.tarch=xtensa` entry for the `esp32:esp32:esp32` board, the record includes the `"build.tarch": "xtensa"` property.
-
-#### Defined in
-
-[src/api.ts:213](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L213)
 
 ---
 
@@ -71,10 +63,6 @@ Build properties used for compiling. The board-specific properties are retrieved
 
 Required Tool dependencies of a board. See [`ToolsDependencies`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.ToolsDependencies) for the CLI API.
 
-#### Defined in
-
-[src/api.ts:234](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L234)
-
 ---
 
 ### Version
@@ -82,10 +70,6 @@ Required Tool dependencies of a board. See [`ToolsDependencies`](https://arduino
 Ƭ **Version**: `string`
 
 Supposed to be a [SemVer](https://semver.org/) as a `string` but it's not enforced by Arduino. You might need to coerce the SemVer string.
-
-#### Defined in
-
-[src/api.ts:208](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L208)
 
 ## Variables
 
@@ -104,12 +88,6 @@ Supposed to be a [SemVer](https://semver.org/) as a `string` but it's not enforc
 | `fromPartial` | (`object`: \{ `option?`: `string` ; `optionLabel?`: `string` ; `values?`: \{ `selected?`: `boolean` ; `value?`: `string` ; `valueLabel?`: `string` }[] }) => [`ConfigOption`](interfaces/ConfigOption.md) |
 | `toJSON`      | (`message`: [`ConfigOption`](interfaces/ConfigOption.md)) => `unknown`                                                                                                                                    |
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:122
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:280
-
 ---
 
 ### ConfigValue
@@ -126,12 +104,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:280
 | `fromJSON`    | (`object`: `any`) => [`ConfigValue`](interfaces/ConfigValue.md)                                                                      |
 | `fromPartial` | (`object`: \{ `selected?`: `boolean` ; `value?`: `string` ; `valueLabel?`: `string` }) => [`ConfigValue`](interfaces/ConfigValue.md) |
 | `toJSON`      | (`message`: [`ConfigValue`](interfaces/ConfigValue.md)) => `unknown`                                                                 |
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:130
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:288
 
 ---
 
@@ -150,12 +122,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:288
 | `fromPartial` | (`object`: \{ `address?`: `string` ; `hardwareId?`: `string` ; `label?`: `string` ; `properties?`: {} ; `protocol?`: `string` ; `protocolLabel?`: `string` }) => [`Port`](interfaces/Port.md) |
 | `toJSON`      | (`message`: [`Port`](interfaces/Port.md)) => `unknown`                                                                                                                                        |
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:3
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:23
-
 ---
 
 ### Programmer
@@ -172,9 +138,3 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:23
 | `fromJSON`    | (`object`: `any`) => [`Programmer`](interfaces/Programmer.md)                                                            |
 | `fromPartial` | (`object`: \{ `id?`: `string` ; `name?`: `string` ; `platform?`: `string` }) => [`Programmer`](interfaces/Programmer.md) |
 | `toJSON`      | (`message`: [`Programmer`](interfaces/Programmer.md)) => `unknown`                                                       |
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:49
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/common.d.ts:191

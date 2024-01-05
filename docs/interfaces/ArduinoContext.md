@@ -47,10 +47,6 @@ Use `arduinoContext?.currentSketch?.boardDetails` instead.
 
 [ArduinoState](ArduinoState.md).[boardDetails](ArduinoState.md#boarddetails)
 
-#### Defined in
-
-[src/api.ts:118](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L118)
-
 ---
 
 ### compileSummary
@@ -67,10 +63,6 @@ Use `arduinoContext?.currentSketch?.compileSummary` instead.
 
 [ArduinoState](ArduinoState.md).[compileSummary](ArduinoState.md#compilesummary)
 
-#### Defined in
-
-[src/api.ts:104](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L104)
-
 ---
 
 ### config
@@ -78,10 +70,6 @@ Use `arduinoContext?.currentSketch?.compileSummary` instead.
 • `Readonly` **config**: [`CliConfig`](CliConfig.md)
 
 The currently configured Arduino CLI configuration.
-
-#### Defined in
-
-[src/api.ts:176](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L176)
 
 ---
 
@@ -91,10 +79,6 @@ The currently configured Arduino CLI configuration.
 
 The currently active sketch (folder) or `undefined`. The current sketch is the one that currently has focus or most recently had focus.
 The current sketch is in the [opened sketches](ArduinoContext.md#openedsketches).
-
-#### Defined in
-
-[src/api.ts:155](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L155)
 
 ---
 
@@ -112,10 +96,6 @@ Use `arduinoContext?.config?.dataDirPath` instead.
 
 [ArduinoState](ArduinoState.md).[dataDirPath](ArduinoState.md#datadirpath)
 
-#### Defined in
-
-[src/api.ts:139](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L139)
-
 ---
 
 ### fqbn
@@ -132,10 +112,6 @@ Use `arduinoContext?.currentSketch?.board?.fqbn` instead.
 
 [ArduinoState](ArduinoState.md).[fqbn](ArduinoState.md#fqbn)
 
-#### Defined in
-
-[src/api.ts:111](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L111)
-
 ---
 
 ### onDidChangeConfig
@@ -143,10 +119,6 @@ Use `arduinoContext?.currentSketch?.board?.fqbn` instead.
 • `Readonly` **onDidChangeConfig**: [`Event`](Event.md)\<[`ChangeEvent`](ChangeEvent.md)\<[`CliConfig`](CliConfig.md)\>\>
 
 An event that is emitter when the [sketchbook](CliConfig.md#userdirpath) (`directories.data`) or the [data directory](CliConfig.md#datadirpath) (`directories.data`) path has changed.
-
-#### Defined in
-
-[src/api.ts:181](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L181)
 
 ---
 
@@ -157,10 +129,6 @@ An event that is emitter when the [sketchbook](CliConfig.md#userdirpath) (`direc
 An [Event](Event.md) that is emitted when the [current sketch](ArduinoContext.md#currentsketch) has changed.
 _Note_ that the event also fires when the active editor changes to `undefined`.
 
-#### Defined in
-
-[src/api.ts:161](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L161)
-
 ---
 
 ### onDidChangeSketch
@@ -168,10 +136,6 @@ _Note_ that the event also fires when the active editor changes to `undefined`.
 • `Readonly` **onDidChangeSketch**: [`Event`](Event.md)\<[`ChangeEvent`](ChangeEvent.md)\<[`SketchFolder`](SketchFolder.md)\>\>
 
 An event that is emitted when the selected [board](SketchFolder.md#board), [port](SketchFolder.md#port), etc., has changed in the [sketch folder](SketchFolder.md).
-
-#### Defined in
-
-[src/api.ts:171](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L171)
 
 ---
 
@@ -181,10 +145,6 @@ An event that is emitted when the selected [board](SketchFolder.md#board), [port
 
 An event that is emitted when sketch folders are added or removed.
 
-#### Defined in
-
-[src/api.ts:166](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L166)
-
 ---
 
 ### openedSketches
@@ -192,10 +152,6 @@ An event that is emitted when sketch folders are added or removed.
 • `Readonly` **openedSketches**: readonly [`SketchFolder`](SketchFolder.md)[]
 
 All opened sketch folders in the window.
-
-#### Defined in
-
-[src/api.ts:149](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L149)
 
 ---
 
@@ -213,10 +169,6 @@ Use `arduinoContext?.currentSketch?.port` instead.
 
 [ArduinoState](ArduinoState.md).[port](ArduinoState.md#port)
 
-#### Defined in
-
-[src/api.ts:125](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L125)
-
 ---
 
 ### sketchPath
@@ -233,10 +185,6 @@ Use `arduinoContext?.currentSketch?.sketchPath` instead.
 
 [ArduinoState](ArduinoState.md).[sketchPath](ArduinoState.md#sketchpath)
 
-#### Defined in
-
-[src/api.ts:97](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L97)
-
 ---
 
 ### userDirPath
@@ -252,10 +200,6 @@ Use `arduinoContext?.config?.userDirPath` instead.
 #### Inherited from
 
 [ArduinoState](ArduinoState.md).[userDirPath](ArduinoState.md#userdirpath)
-
-#### Defined in
-
-[src/api.ts:132](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L132)
 
 ## Methods
 
@@ -282,7 +226,3 @@ Use `arduinoContext?.config?.userDirPath` instead.
 **`Deprecated`**
 
 Use `onDidChangeSketch` and `onDidChangeConfig` instead.
-
-#### Defined in
-
-[src/api.ts:186](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L186)

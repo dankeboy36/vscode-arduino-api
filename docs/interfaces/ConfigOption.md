@@ -16,10 +16,6 @@
 
 ID of the configuration option. For identifying the option to machines.
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:124
-
 ---
 
 ### optionLabel
@@ -28,10 +24,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:124
 
 Name of the configuration option for identifying the option to humans.
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:126
-
 ---
 
 ### values
@@ -39,7 +31,3 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:126
 • **values**: [`ConfigValue`](ConfigValue.md)[]
 
 Possible values of the configuration option.
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/board.d.ts:128

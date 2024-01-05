@@ -32,10 +32,6 @@ Lightweight representation of the board's detail. This information is [provided 
 
 Use `arduinoContext?.currentSketch?.boardDetails` instead.
 
-#### Defined in
-
-[src/api.ts:118](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L118)
-
 ---
 
 ### compileSummary
@@ -47,10 +43,6 @@ The summary of the latest sketch compilation. When the `sketchPath` is available
 **`Deprecated`**
 
 Use `arduinoContext?.currentSketch?.compileSummary` instead.
-
-#### Defined in
-
-[src/api.ts:104](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L104)
 
 ---
 
@@ -64,10 +56,6 @@ Filesystem path to the [`directories.data`](https://arduino.github.io/arduino-cl
 
 Use `arduinoContext?.config?.dataDirPath` instead.
 
-#### Defined in
-
-[src/api.ts:139](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L139)
-
 ---
 
 ### fqbn
@@ -79,10 +67,6 @@ The Fully Qualified Board Name (FQBN) of the currently selected board in the Ard
 **`Deprecated`**
 
 Use `arduinoContext?.currentSketch?.board?.fqbn` instead.
-
-#### Defined in
-
-[src/api.ts:111](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L111)
 
 ---
 
@@ -96,10 +80,6 @@ The currently selected port in the Arduino IDE.
 
 Use `arduinoContext?.currentSketch?.port` instead.
 
-#### Defined in
-
-[src/api.ts:125](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L125)
-
 ---
 
 ### sketchPath
@@ -112,10 +92,6 @@ Absolute filesystem path of the sketch folder.
 
 Use `arduinoContext?.currentSketch?.sketchPath` instead.
 
-#### Defined in
-
-[src/api.ts:97](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L97)
-
 ---
 
 ### userDirPath
@@ -127,7 +103,3 @@ Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cl
 **`Deprecated`**
 
 Use `arduinoContext?.config?.userDirPath` instead.
-
-#### Defined in
-
-[src/api.ts:132](https://github.com/dankeboy36/vscode-arduino-api/blob/0badc9d/src/api.ts#L132)

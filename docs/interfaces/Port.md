@@ -21,10 +21,6 @@ Port represents a board port that may be used to upload or to monitor a board
 
 Address of the port (e.g., `/dev/ttyACM0`).
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:5
-
 ---
 
 ### hardwareId
@@ -33,10 +29,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:5
 
 The hardware ID (serial number) of the board attached to the port
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:17
-
 ---
 
 ### label
@@ -44,10 +36,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:17
 • **label**: `string`
 
 The port label to show on the GUI (e.g. "ttyACM0")
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:7
 
 ---
 
@@ -61,10 +49,6 @@ A set of properties of the port
 
 ▪ [key: `string`]: `string`
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:13
-
 ---
 
 ### protocol
@@ -73,10 +57,6 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:13
 
 Protocol of the port (e.g., `serial`, `network`, ...).
 
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:9
-
 ---
 
 ### protocolLabel
@@ -84,7 +64,3 @@ node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:9
 • **protocolLabel**: `string`
 
 A human friendly description of the protocol (e.g., "Serial Port (USB)").
-
-#### Defined in
-
-node_modules/ardunno-cli/dist/api/cc/arduino/cli/commands/v1/port.d.ts:11

@@ -41,7 +41,3 @@ a listener function as argument.
 [`Disposable`](../classes/Disposable.md)
 
 A disposable which unsubscribes the event listener.
-
-#### Defined in
-
-node_modules/@types/vscode/index.d.ts:1606

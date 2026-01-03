@@ -1,33 +1,45 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: ConfigOption
 
-## Table of contents
+## Extends
 
-### Properties
-
-- [option](ConfigOption.md#option)
-- [optionLabel](ConfigOption.md#optionlabel)
-- [values](ConfigOption.md#values)
+- `ConfigOption`
 
 ## Properties
 
 ### option
 
-• **option**: `string`
+> **option**: `string`
 
 ID of the configuration option. For identifying the option to machines.
+
+#### Inherited from
+
+`CliConfigOption.option`
 
 ---
 
 ### optionLabel
 
-• **optionLabel**: `string`
+> **optionLabel**: `string`
 
 Name of the configuration option for identifying the option to humans.
+
+#### Inherited from
+
+`CliConfigOption.optionLabel`
 
 ---
 
 ### values
 
-• **values**: [`ConfigValue`](ConfigValue.md)[]
+> **values**: `ConfigValue`[]
 
 Possible values of the configuration option.
+
+#### Inherited from
+
+`CliConfigOption.values`

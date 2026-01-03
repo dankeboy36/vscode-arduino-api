@@ -1,33 +1,45 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: Programmer
 
-## Table of contents
+## Extends
 
-### Properties
-
-- [id](Programmer.md#id)
-- [name](Programmer.md#name)
-- [platform](Programmer.md#platform)
+- `Programmer`
 
 ## Properties
 
 ### id
 
-• **id**: `string`
+> **id**: `string`
 
-Programmer ID
+Programmer ID.
+
+#### Inherited from
+
+`CliProgrammer.id`
 
 ---
 
 ### name
 
-• **name**: `string`
+> **name**: `string`
 
-Programmer name
+Programmer name.
+
+#### Inherited from
+
+`CliProgrammer.name`
 
 ---
 
 ### platform
 
-• **platform**: `string`
+> **platform**: `string`
 
-Platform name
+Platform name.
+
+#### Inherited from
+
+`CliProgrammer.platform`

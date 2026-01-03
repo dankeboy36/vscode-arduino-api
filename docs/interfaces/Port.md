@@ -1,66 +1,85 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: Port
 
-Port represents a board port that may be used to upload or to monitor a board
+## Extends
 
-## Table of contents
-
-### Properties
-
-- [address](Port.md#address)
-- [hardwareId](Port.md#hardwareid)
-- [label](Port.md#label)
-- [properties](Port.md#properties)
-- [protocol](Port.md#protocol)
-- [protocolLabel](Port.md#protocollabel)
+- `Port`
 
 ## Properties
 
 ### address
 
-• **address**: `string`
+> **address**: `string`
 
 Address of the port (e.g., `/dev/ttyACM0`).
+
+#### Inherited from
+
+`CliPort.address`
 
 ---
 
 ### hardwareId
 
-• **hardwareId**: `string`
+> **hardwareId**: `string`
 
-The hardware ID (serial number) of the board attached to the port
+The hardware ID (serial number) of the board attached to the port.
+
+#### Inherited from
+
+`CliPort.hardwareId`
 
 ---
 
 ### label
 
-• **label**: `string`
+> **label**: `string`
 
-The port label to show on the GUI (e.g. "ttyACM0")
+The port label to show on the GUI (e.g. "ttyACM0").
+
+#### Inherited from
+
+`CliPort.label`
 
 ---
 
 ### properties
 
-• **properties**: `Object`
+> **properties**: `object`
 
-A set of properties of the port
+A set of properties of the port.
 
-#### Index signature
+#### Index Signature
 
-▪ [key: `string`]: `string`
+\[`key`: `string`\]: `string`
+
+#### Inherited from
+
+`CliPort.properties`
 
 ---
 
 ### protocol
 
-• **protocol**: `string`
+> **protocol**: `string`
 
 Protocol of the port (e.g., `serial`, `network`, ...).
+
+#### Inherited from
+
+`CliPort.protocol`
 
 ---
 
 ### protocolLabel
 
-• **protocolLabel**: `string`
+> **protocolLabel**: `string`
 
 A human friendly description of the protocol (e.g., "Serial Port (USB)").
+
+#### Inherited from
+
+`CliPort.protocolLabel`

@@ -1,33 +1,45 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: ConfigValue
 
-## Table of contents
+## Extends
 
-### Properties
-
-- [selected](ConfigValue.md#selected)
-- [value](ConfigValue.md#value)
-- [valueLabel](ConfigValue.md#valuelabel)
+- `ConfigValue`
 
 ## Properties
 
 ### selected
 
-• **selected**: `boolean`
+> **selected**: `boolean`
 
 Whether the configuration option is selected.
+
+#### Inherited from
+
+`CliConfigValue.selected`
 
 ---
 
 ### value
 
-• **value**: `string`
+> **value**: `string`
 
 The configuration option value.
+
+#### Inherited from
+
+`CliConfigValue.value`
 
 ---
 
 ### valueLabel
 
-• **valueLabel**: `string`
+> **valueLabel**: `string`
 
 Label to identify the configuration option to humans.
+
+#### Inherited from
+
+`CliConfigValue.valueLabel`

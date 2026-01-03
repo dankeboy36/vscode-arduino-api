@@ -1,93 +1,101 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: BoardDetails
 
-The lightweight representation of all details of a particular board. See [`BoardDetailsResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the CLI API.
+**`Alpha`**
 
-## Hierarchy
+The lightweight representation of all details of a particular board. See
+[`BoardDetailsResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
+for the CLI API.
+
+## Extends
 
 - `Readonly`\<`Pick`\<`BoardDetailsResponse`, `"fqbn"` \| `"name"` \| `"configOptions"` \| `"programmers"` \| `"defaultProgrammerId"`\>\>
-
-  ↳ **`BoardDetails`**
-
-## Table of contents
-
-### Properties
-
-- [buildProperties](BoardDetails.md#buildproperties)
-- [configOptions](BoardDetails.md#configoptions)
-- [defaultProgrammerId](BoardDetails.md#defaultprogrammerid)
-- [fqbn](BoardDetails.md#fqbn)
-- [name](BoardDetails.md#name)
-- [programmers](BoardDetails.md#programmers)
-- [toolsDependencies](BoardDetails.md#toolsdependencies)
 
 ## Properties
 
 ### buildProperties
 
-• `Readonly` **buildProperties**: `Readonly`\<`Record`\<`string`, `string`\>\>
+> `readonly` **buildProperties**: [`BuildProperties`](../type-aliases/BuildProperties.md)
+
+**`Alpha`**
 
 ---
 
 ### configOptions
 
-• `Readonly` **configOptions**: [`ConfigOption`](ConfigOption.md)[]
+> `readonly` **configOptions**: `ConfigOption`[]
+
+**`Alpha`**
 
 The board's custom configuration options.
 
 #### Inherited from
 
-Readonly.configOptions
+`Readonly.configOptions`
 
 ---
 
 ### defaultProgrammerId
 
-• `Readonly` **defaultProgrammerId**: `string`
+> `readonly` **defaultProgrammerId**: `string`
 
-Default programmer for the board
+**`Alpha`**
+
+Default programmer for the board.
 
 #### Inherited from
 
-Readonly.defaultProgrammerId
+`Readonly.defaultProgrammerId`
 
 ---
 
 ### fqbn
 
-• `Readonly` **fqbn**: `string`
+> `readonly` **fqbn**: `string`
+
+**`Alpha`**
 
 The fully qualified board name of the board.
 
 #### Inherited from
 
-Readonly.fqbn
+`Readonly.fqbn`
 
 ---
 
 ### name
 
-• `Readonly` **name**: `string`
+> `readonly` **name**: `string`
+
+**`Alpha`**
 
 Name used to identify the board to humans (e.g., Arduino Uno).
 
 #### Inherited from
 
-Readonly.name
+`Readonly.name`
 
 ---
 
 ### programmers
 
-• `Readonly` **programmers**: [`Programmer`](Programmer.md)[]
+> `readonly` **programmers**: `Programmer`[]
 
-List of programmers supported by the board
+**`Alpha`**
+
+List of programmers supported by the board.
 
 #### Inherited from
 
-Readonly.programmers
+`Readonly.programmers`
 
 ---
 
 ### toolsDependencies
 
-• `Readonly` **toolsDependencies**: `Readonly`\<`Pick`\<`ToolsDependencies`, `"name"` \| `"version"` \| `"packager"`\>\>[]
+> `readonly` **toolsDependencies**: `Readonly`\<`Pick`\<`ToolsDependencies`, `"name"` \| `"version"` \| `"packager"`\>\>[]
+
+**`Alpha`**

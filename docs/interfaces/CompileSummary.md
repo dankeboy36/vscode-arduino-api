@@ -1,86 +1,93 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: CompileSummary
 
-Summary of a sketch compilation. See [`CompileResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#compileresponse) for the CLI API.
+**`Alpha`**
 
-## Hierarchy
+Summary of a sketch compilation. See
+[`BuilderResult`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BuilderResult)
+of the CLI API.
 
-- `Readonly`\<`Pick`\<`CompileResponse`, `"buildPath"` \| `"usedLibraries"` \| `"executableSectionsSize"` \| `"boardPlatform"` \| `"buildPlatform"`\>\>
+## Extends
 
-  ↳ **`CompileSummary`**
-
-## Table of contents
-
-### Properties
-
-- [boardPlatform](CompileSummary.md#boardplatform)
-- [buildPath](CompileSummary.md#buildpath)
-- [buildPlatform](CompileSummary.md#buildplatform)
-- [buildProperties](CompileSummary.md#buildproperties)
-- [executableSectionsSize](CompileSummary.md#executablesectionssize)
-- [usedLibraries](CompileSummary.md#usedlibraries)
+- `Readonly`\<`Pick`\<`BuilderResult`, `"buildPath"` \| `"usedLibraries"` \| `"executableSectionsSize"` \| `"boardPlatform"` \| `"buildPlatform"`\>\>
 
 ## Properties
 
 ### boardPlatform
 
-• `Readonly` **boardPlatform**: `undefined` \| `InstalledPlatformReference`
+> `readonly` **boardPlatform**: `InstalledPlatformReference` \| `undefined`
 
-The platform where the board is defined
+**`Alpha`**
+
+The platform where the board is defined.
 
 #### Inherited from
 
-Readonly.boardPlatform
+`Readonly.boardPlatform`
 
 ---
 
 ### buildPath
 
-• `Readonly` **buildPath**: `string`
+> `readonly` **buildPath**: `string`
 
-The compiler build path
+**`Alpha`**
+
+The compiler build path.
 
 #### Inherited from
 
-Readonly.buildPath
+`Readonly.buildPath`
 
 ---
 
 ### buildPlatform
 
-• `Readonly` **buildPlatform**: `undefined` \| `InstalledPlatformReference`
+> `readonly` **buildPlatform**: `InstalledPlatformReference` \| `undefined`
 
-The platform used for the build (if referenced from the board platform)
+**`Alpha`**
+
+The platform used for the build (if referenced from the board platform).
 
 #### Inherited from
 
-Readonly.buildPlatform
+`Readonly.buildPlatform`
 
 ---
 
 ### buildProperties
 
-• `Readonly` **buildProperties**: `Readonly`\<`Record`\<`string`, `string`\>\>
+> `readonly` **buildProperties**: [`BuildProperties`](../type-aliases/BuildProperties.md)
+
+**`Alpha`**
 
 ---
 
 ### executableSectionsSize
 
-• `Readonly` **executableSectionsSize**: `ExecutableSectionSize`[]
+> `readonly` **executableSectionsSize**: `ExecutableSectionSize`[]
 
-The size of the executable split by sections
+**`Alpha`**
+
+The size of the executable split by sections.
 
 #### Inherited from
 
-Readonly.executableSectionsSize
+`Readonly.executableSectionsSize`
 
 ---
 
 ### usedLibraries
 
-• `Readonly` **usedLibraries**: `Library`[]
+> `readonly` **usedLibraries**: `Library`[]
 
-The libraries used in the build
+**`Alpha`**
+
+The libraries used in the build.
 
 #### Inherited from
 
-Readonly.usedLibraries
+`Readonly.usedLibraries`

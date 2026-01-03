@@ -27,16 +27,16 @@ If you want to use the Arduino APIs, you have to do the followings:
 1.  Consume the `ArduinoContext` extension API in your VS Code extension:
 
     ```ts
-    import * as vscode from 'vscode';
-    import type { ArduinoContext } from 'vscode-arduino-api';
+    import * as vscode from 'vscode'
+    import type { ArduinoContext } from 'vscode-arduino-api'
 
     export function activate(context: vscode.ExtensionContext) {
       const context: ArduinoContext = vscode.extensions.getExtension(
         'dankeboy36.vscode-arduino-api'
-      )?.exports;
+      )?.exports
       if (!context) {
         // Failed to load the Arduino API.
-        return;
+        return
       }
 
       // Use the Arduino API in your VS Code extension.
@@ -47,9 +47,9 @@ If you want to use the Arduino APIs, you have to do the followings:
         vscode.commands.registerCommand('myExtension.showSketchPath', () => {
           vscode.window.showInformationMessage(
             `Sketch path: ${context.sketchPath}`
-          );
+          )
         })
-      );
+      )
 
       // Listen on state change.
       // Register a listener to show the FQBN of the currently selected board as an information message.
@@ -57,9 +57,9 @@ If you want to use the Arduino APIs, you have to do the followings:
         if (event.changedProperties.includes('board')) {
           vscode.window.showInformationMessage(
             `FQBN: ${event.object.board?.fqbn}`
-          );
+          )
         }
-      });
+      })
     }
     ```
 

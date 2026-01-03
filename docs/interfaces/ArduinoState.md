@@ -1,105 +1,106 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: ArduinoState
 
 The current state of the Arduino IDE.
 
-## Hierarchy
+## Extended by
 
-- **`ArduinoState`**
-
-  ↳ [`ArduinoContext`](ArduinoContext.md)
-
-## Table of contents
-
-### Properties
-
-- [boardDetails](ArduinoState.md#boarddetails)
-- [compileSummary](ArduinoState.md#compilesummary)
-- [dataDirPath](ArduinoState.md#datadirpath)
-- [fqbn](ArduinoState.md#fqbn)
-- [port](ArduinoState.md#port)
-- [sketchPath](ArduinoState.md#sketchpath)
-- [userDirPath](ArduinoState.md#userdirpath)
+- [`ArduinoContext`](ArduinoContext.md)
 
 ## Properties
 
-### boardDetails
+### ~~boardDetails~~
 
-• `Readonly` **boardDetails**: `undefined` \| [`BoardDetails`](BoardDetails.md)
+> `readonly` **boardDetails**: [`BoardDetails`](BoardDetails.md) \| `undefined`
 
-Lightweight representation of the board's detail. This information is [provided by the Arduino CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse) for the currently selected board. It can be `undefined` if the `fqbn` is defined but the platform is not installed.
+Lightweight representation of the board's detail. This information is
+[provided by the Arduino
+CLI](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
+for the currently selected board. It can be `undefined` if the `fqbn` is
+defined but the platform is not installed.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.currentSketch?.boardDetails` instead.
 
 ---
 
-### compileSummary
+### ~~compileSummary~~
 
-• `Readonly` **compileSummary**: `undefined` \| [`CompileSummary`](CompileSummary.md)
+> `readonly` **compileSummary**: [`CompileSummary`](CompileSummary.md) \| `undefined`
 
-The summary of the latest sketch compilation. When the `sketchPath` is available but the sketch has not been verified (compiled), the `buildPath` can be `undefined`.
+The summary of the latest sketch compilation. When the `sketchPath` is
+available but the sketch has not been verified (compiled), the `buildPath`
+can be `undefined`.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.currentSketch?.compileSummary` instead.
 
 ---
 
-### dataDirPath
+### ~~dataDirPath~~
 
-• `Readonly` **dataDirPath**: `undefined` \| `string`
+> `readonly` **dataDirPath**: `string` \| `undefined`
 
-Filesystem path to the [`directories.data`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location.
+Filesystem path to the
+[`directories.data`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys)
+location.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.config?.dataDirPath` instead.
 
 ---
 
-### fqbn
+### ~~fqbn~~
 
-• `Readonly` **fqbn**: `undefined` \| `string`
+> `readonly` **fqbn**: `string` \| `undefined`
 
-The Fully Qualified Board Name (FQBN) of the currently selected board in the Arduino IDE.
+The Fully Qualified Board Name (FQBN) of the currently selected board in
+the Arduino IDE.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.currentSketch?.board?.fqbn` instead.
 
 ---
 
-### port
+### ~~port~~
 
-• `Readonly` **port**: `undefined` \| [`Port`](Port.md)
+> `readonly` **port**: [`Port`](Port.md) \| `undefined`
 
 The currently selected port in the Arduino IDE.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.currentSketch?.port` instead.
 
 ---
 
-### sketchPath
+### ~~sketchPath~~
 
-• `Readonly` **sketchPath**: `undefined` \| `string`
+> `readonly` **sketchPath**: `string` \| `undefined`
 
 Absolute filesystem path of the sketch folder.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.currentSketch?.sketchPath` instead.
 
 ---
 
-### userDirPath
+### ~~userDirPath~~
 
-• `Readonly` **userDirPath**: `undefined` \| `string`
+> `readonly` **userDirPath**: `string` \| `undefined`
 
-Filesystem path to the [`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys) location. This is the sketchbook path.
+Filesystem path to the
+[`directories.user`](https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys)
+location. This is the sketchbook path.
 
-**`Deprecated`**
+#### Deprecated
 
 Use `arduinoContext?.config?.userDirPath` instead.

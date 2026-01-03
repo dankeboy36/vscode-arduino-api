@@ -4,6 +4,10 @@
 
 # Interface: Programmer
 
+## Extends
+
+- `Programmer`
+
 ## Properties
 
 ### id
@@ -11,6 +15,10 @@
 > **id**: `string`
 
 Programmer ID.
+
+#### Inherited from
+
+`CliProgrammer.id`
 
 ---
 
@@ -20,6 +28,10 @@ Programmer ID.
 
 Programmer name.
 
+#### Inherited from
+
+`CliProgrammer.name`
+
 ---
 
 ### platform
@@ -27,3 +39,7 @@ Programmer name.
 > **platform**: `string`
 
 Platform name.
+
+#### Inherited from
+
+`CliProgrammer.platform`

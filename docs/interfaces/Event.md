@@ -23,7 +23,7 @@ item.onDidChange(function (event) {
 
 `T`
 
-> **Event**(`listener`, `thisArgs?`, `disposables?`): [`Disposable`](Disposable.md)
+> **Event**(`listener`, `thisArgs?`, `disposables?`): `Disposable`
 
 A function that represents an event to which you subscribe by calling it with
 a listener function as argument.
@@ -44,12 +44,12 @@ The `this`-argument which will be used when calling the event listener.
 
 ### disposables?
 
-[`Disposable`](Disposable.md)[]
+`Disposable`[]
 
 An array to which a [Disposable](Disposable.md) will be added.
 
 ## Returns
 
-[`Disposable`](Disposable.md)
+`Disposable`
 
 A disposable which unsubscribes the event listener.

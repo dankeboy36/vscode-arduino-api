@@ -52,7 +52,7 @@ The FQBN with all the custom board options (if any) for the sketch.
 
 ### port
 
-> `readonly` **port**: `Readonly`\<`Pick`\<[`Port`](../type-aliases/Port.md), `"protocol"` \| `"address"`\>\> \| `Readonly`\<[`Port`](../type-aliases/Port.md)\> \| `undefined`
+> `readonly` **port**: `Readonly`\<`Pick`\<`Port`, `"protocol"` \| `"address"`\>\> \| `Readonly`\<[`Port`](Port.md)\> \| `undefined`
 
 **`Alpha`**
 
@@ -62,7 +62,7 @@ The currently selected port in the sketch folder.
 
 ### selectedProgrammer
 
-> `readonly` **selectedProgrammer**: `string` \| `Readonly`\<[`Programmer`](../type-aliases/Programmer.md)\> \| `undefined`
+> `readonly` **selectedProgrammer**: `string` \| `Readonly`\<[`Programmer`](Programmer.md)\> \| `undefined`
 
 **`Alpha`**
 

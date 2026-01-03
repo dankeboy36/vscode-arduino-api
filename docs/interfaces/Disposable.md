@@ -4,17 +4,14 @@
 
 # Interface: Disposable
 
-Represents a type which can release resources, such
-as event listening or a timer.
+Represents a type which can release resources, such as event listening or a timer.
 
 ## Methods
 
 ### dispose()
 
-> **dispose**(): `any`
-
-Dispose this object.
+> **dispose**(): `void`
 
 #### Returns
 
-`any`
+`void`

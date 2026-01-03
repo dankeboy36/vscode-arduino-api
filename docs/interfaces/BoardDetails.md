@@ -26,7 +26,7 @@ for the CLI API.
 
 ### configOptions
 
-> `readonly` **configOptions**: [`ConfigOption`](../type-aliases/ConfigOption.md)[]
+> `readonly` **configOptions**: `ConfigOption`[]
 
 **`Alpha`**
 
@@ -82,7 +82,7 @@ Name used to identify the board to humans (e.g., Arduino Uno).
 
 ### programmers
 
-> `readonly` **programmers**: [`Programmer`](../type-aliases/Programmer.md)[]
+> `readonly` **programmers**: `Programmer`[]
 
 **`Alpha`**
 

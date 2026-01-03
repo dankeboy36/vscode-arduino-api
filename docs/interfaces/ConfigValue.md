@@ -4,6 +4,10 @@
 
 # Interface: ConfigValue
 
+## Extends
+
+- `ConfigValue`
+
 ## Properties
 
 ### selected
@@ -11,6 +15,10 @@
 > **selected**: `boolean`
 
 Whether the configuration option is selected.
+
+#### Inherited from
+
+`CliConfigValue.selected`
 
 ---
 
@@ -20,6 +28,10 @@ Whether the configuration option is selected.
 
 The configuration option value.
 
+#### Inherited from
+
+`CliConfigValue.value`
+
 ---
 
 ### valueLabel
@@ -27,3 +39,7 @@ The configuration option value.
 > **valueLabel**: `string`
 
 Label to identify the configuration option to humans.
+
+#### Inherited from
+
+`CliConfigValue.valueLabel`

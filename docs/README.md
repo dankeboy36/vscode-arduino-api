@@ -25,9 +25,5 @@
 
 - [BoardIdentifier](type-aliases/BoardIdentifier.md)
 - [BuildProperties](type-aliases/BuildProperties.md)
-- [ConfigOption](type-aliases/ConfigOption.md)
-- [ConfigValue](type-aliases/ConfigValue.md)
-- [Port](type-aliases/Port.md)
-- [Programmer](type-aliases/Programmer.md)
 - [Tool](type-aliases/Tool.md)
 - [Version](type-aliases/Version.md)

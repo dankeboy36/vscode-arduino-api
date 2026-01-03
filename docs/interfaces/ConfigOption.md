@@ -4,6 +4,10 @@
 
 # Interface: ConfigOption
 
+## Extends
+
+- `ConfigOption`
+
 ## Properties
 
 ### option
@@ -11,6 +15,10 @@
 > **option**: `string`
 
 ID of the configuration option. For identifying the option to machines.
+
+#### Inherited from
+
+`CliConfigOption.option`
 
 ---
 
@@ -20,10 +28,18 @@ ID of the configuration option. For identifying the option to machines.
 
 Name of the configuration option for identifying the option to humans.
 
+#### Inherited from
+
+`CliConfigOption.optionLabel`
+
 ---
 
 ### values
 
-> **values**: [`ConfigValue`](../type-aliases/ConfigValue.md)[]
+> **values**: `ConfigValue`[]
 
 Possible values of the configuration option.
+
+#### Inherited from
+
+`CliConfigOption.values`

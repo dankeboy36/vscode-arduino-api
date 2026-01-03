@@ -1,10 +1,10 @@
 import type {
   BoardDetailsResponse,
   BuilderResult,
-  ConfigOption,
-  ConfigValue,
-  Port,
-  Programmer,
+  ConfigOption as CliConfigOption,
+  ConfigValue as CliConfigValue,
+  Port as CliPort,
+  Programmer as CliProgrammer,
   ToolsDependencies,
 } from 'ardunno-cli'
 import type { BoardIdentifier, PortIdentifier } from 'boards-list'
@@ -283,5 +283,16 @@ export interface CompileSummary extends Readonly<
   readonly buildProperties: BuildProperties
 }
 
-export type { Disposable, Event } from 'vscode'
-export type { BoardIdentifier, ConfigOption, ConfigValue, Port, Programmer }
+/**
+ * Represents a type which can release resources, such as event listening or a timer.
+ */
+export interface Disposable {
+  dispose(): void
+}
+
+export type { Event } from 'vscode'
+export type { BoardIdentifier } from 'boards-list'
+export interface ConfigOption extends CliConfigOption {}
+export interface ConfigValue extends CliConfigValue {}
+export interface Port extends CliPort {}
+export interface Programmer extends CliProgrammer {}

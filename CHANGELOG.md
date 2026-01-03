@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.1...0.2.2) (2026-01-03)
+
+
+### Bug Fixes
+
+* derive `CompileSummary` from `BuilderResult` ([#20](https://github.com/dankeboy36/vscode-arduino-api/issues/20)) ([8b2cbdb](https://github.com/dankeboy36/vscode-arduino-api/commit/8b2cbdb0bd7f691591cc8404c7ca46165aacd648))
+
 ## [0.2.1](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.0...0.2.1) (2024-01-05)
 
 

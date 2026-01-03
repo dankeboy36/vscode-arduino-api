@@ -37,7 +37,6 @@
     "postdoc": "prettier --write ./docs",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts",
-    "lint:fix": "eslint src --ext ts --fix",
     "release": "semantic-release",
     "pretest": "npm run compile-tests",
     "test": "node ./out/test/runTest.js",

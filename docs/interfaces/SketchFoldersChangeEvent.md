@@ -1,19 +1,17 @@
+[**vscode-arduino-api**](../README.md)
+
+---
+
 # Interface: SketchFoldersChangeEvent
 
-An event describing a change to the set of [sketch folders](SketchFolder.md).
-
-## Table of contents
-
-### Properties
-
-- [addedPaths](SketchFoldersChangeEvent.md#addedpaths)
-- [removedPaths](SketchFoldersChangeEvent.md#removedpaths)
+An event describing a change to the set of
+[sketch folders](SketchFolder.md).
 
 ## Properties
 
 ### addedPaths
 
-• `Readonly` **addedPaths**: readonly `string`[]
+> `readonly` **addedPaths**: readonly `string`[]
 
 Added sketch folders.
 
@@ -21,6 +19,6 @@ Added sketch folders.
 
 ### removedPaths
 
-• `Readonly` **removedPaths**: readonly `string`[]
+> `readonly` **removedPaths**: readonly `string`[]
 
 Removed sketch folders.

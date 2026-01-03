@@ -1,4 +1,8 @@
-name: Build
+name: CI
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   push:
     branches:
@@ -9,64 +13,79 @@ on:
       - main
 
 jobs:
-  build:
-    name: test (${{ matrix.os }}, node-${{ matrix.node }}
+  test:
+    name: Test (${{ matrix.os }}, node-${{ matrix.node }})
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        node: [18.x]
+        node: [22.14.0]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.config.node }}
+          node-version: ${{ matrix.node }}
+
       - name: Install Dependencies
         run: npm ci
-      - name: Check API Docs
-        run: npm run doc && git diff --exit-code
+
       - name: Check Format
         run: npm run format && git diff --exit-code
+
+      - name: Check API Docs
+        run: npm run doc && git diff --exit-code
+
       - name: Lint
         run: npm run lint
+
       - name: Test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm test
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [test]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
+
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 22.14.0
+
       - name: Install Dependencies
         run: npm ci
+
       - name: Build
         run: npm run build
+
       - name: Generate Typings
         run: npm run typings
+
+      - name: Load secrets from 1Password
+        id: load_secrets
+        uses: 1password/load-secrets-action@v3
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          GITHUB_TOKEN: op://cicd_dankeboy36/GITHUB_TOKEN/credential
+          NPM_TOKEN: op://cicd_dankeboy36/NPM_TOKEN/credential
+
       - name: Release
         id: release
         run: npm run release
         env:
-          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN }}
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.load_secrets.outputs.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ steps.load_secrets.outputs.NPM_TOKEN }}
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}

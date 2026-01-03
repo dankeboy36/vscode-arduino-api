@@ -284,14 +284,15 @@ export interface CompileSummary extends Readonly<
 }
 
 /**
- * Represents a type which can release resources, such as event listening or a timer.
+ * Represents a type which can release resources, such as event listening or a
+ * timer.
  */
 export interface Disposable {
   dispose(): void
 }
 
-export type { Event } from 'vscode'
 export type { BoardIdentifier } from 'boards-list'
+export type { Event } from 'vscode'
 export interface ConfigOption extends CliConfigOption {}
 export interface ConfigValue extends CliConfigValue {}
 export interface Port extends CliPort {}

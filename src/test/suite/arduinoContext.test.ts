@@ -773,6 +773,7 @@ describe('arduinoContext', () => {
                 assert.deepStrictEqual(context.boardDetails, expectedValue)
               } else if (isBoardIdentifier(expectedValue)) {
                 assert.deepStrictEqual(context.fqbn, expectedValue.fqbn)
+                assert.strictEqual(context.boardDetails, undefined)
               } else {
                 assert.deepStrictEqual(context.fqbn, expectedValue)
                 assert.deepStrictEqual(context.boardDetails, expectedValue)

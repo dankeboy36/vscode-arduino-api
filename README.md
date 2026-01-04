@@ -1,88 +1,94 @@
 # vscode-arduino-api
 
-[![Build](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/build.yml)
+[![Build](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dankeboy36/vscode-arduino-api/actions/workflows/ci.yml)
+![NPM Version](https://img.shields.io/npm/v/vscode-arduino-api)
 
-[Arduino IDE](https://github.com/arduino/arduino-ide) API for VS Code extensions.
+This is a types-only npm package providing the ArduinoContext API contract for Arduino IDE 2.x and BoardLab tools. The npm tarball ships no runtime JavaScript; runtime providers are supplied by the host environment.
 
-This VS Code extension does not provide any functionality but a bridge between the Arduino IDE and external tools implemented as a VS Code extension. Please reference [arduino/arduino-ide#58](https://github.com/arduino/arduino-ide/issues/58) to see why this VSIX has been created.
+The `main` entry in `package.json` exists for the Arduino IDE 2.x / Theia extension build. The runtime JavaScript referenced by `main` is not published to npm.
 
-> ⚠️ This extension has nothing to do with the [Visual Studio Code extension for Arduino](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino).
+## What this is
 
-## API
+- A compile-time contract for the [`ArduinoContext` API](./docs/README.md).
+- The npm package contains no runtime JavaScript.
+- The runtime provider is host-specific (IDE2 built-in or BoardLab in VS Code).
 
-[See](https://github.com/dankeboy36/vscode-arduino-api/blob/main/docs/README.md) the full API on GitHub.
+The primary, current target is Visual Studio Code with BoardLab as the runtime provider. The IDE2 lane (0.1.x) is legacy and receives compatibility-only updates.
 
-## How to Use
+## Runtime providers
 
-If you're developing an external tool for the Arduino IDE, this extension will be available at runtime from the IDE.
+- Visual Studio Code: provider is BoardLab (`dankeboy36.boardlab`). Tools should depend on BoardLab for runtime access.
+- Arduino IDE 2.x: provider is bundled in the IDE. It does not download this extension from Open VSX or the Visual Studio Code Marketplace.
 
-If you want to use the Arduino APIs, you have to do the followings:
+## Compatibility lanes
 
-1.  Install the [Arduino API types](https://www.npmjs.com/package/vscode-arduino-api) from `npm`:
+- BoardLab lane: `vscode-arduino-api@latest` (0.2.x+) for Visual Studio Code + BoardLab.
+- IDE2 lane: `vscode-arduino-api@ide2` (0.1.x) for Arduino IDE 2.x tools ([deprecated API surface](https://github.com/dankeboy36/vscode-arduino-api/blob/0.1.2/src/api.ts)).
 
-    ```shell
-    npm install vscode-arduino-api --save
-    ```
+## Install types
 
-1.  Consume the `ArduinoContext` extension API in your VS Code extension:
+This package provides only TypeScript types. Install the appropriate version depending on your target environment:
 
-    ```ts
-    import * as vscode from 'vscode'
-    import type { ArduinoContext } from 'vscode-arduino-api'
+### Visual Studio Code + BoardLab tools
 
-    export function activate(context: vscode.ExtensionContext) {
-      const context: ArduinoContext = vscode.extensions.getExtension(
-        'dankeboy36.vscode-arduino-api'
-      )?.exports
-      if (!context) {
-        // Failed to load the Arduino API.
-        return
-      }
+```shell
+npm install -D vscode-arduino-api
+```
 
-      // Use the Arduino API in your VS Code extension.
+BoardLab provides the runtime API in Visual Studio Code and must be present as an extension dependency.
 
-      // Read the state.
-      // Register a command to access the sketch path and show it as an information message.
-      context.subscriptions.push(
-        vscode.commands.registerCommand('myExtension.showSketchPath', () => {
-          vscode.window.showInformationMessage(
-            `Sketch path: ${context.sketchPath}`
-          )
-        })
-      )
+### Arduino IDE 2.x tools (deprecated API)
 
-      // Listen on state change.
-      // Register a listener to show the FQBN of the currently selected board as an information message.
-      context.onDidChangeSketch((event) => {
-        if (event.changedProperties.includes('board')) {
-          vscode.window.showInformationMessage(
-            `FQBN: ${event.object.board?.fqbn}`
-          )
-        }
-      })
-    }
-    ```
+```shell
+npm install -D vscode-arduino-api@ide2
+```
 
-## Extension Settings
+### Additional type dependencies
 
-This extension contributes the following settings:
+These peer dependencies are required for type resolution. Install them if they are not already present in your extension development setup:
 
-- `arduinoAPI.log`: set to `true` to enable logging of state updates. It's `false` by default.
-- `arduinoAPI.compareBeforeUpdate`: set to `true` to relax the state update. If `true`, a value will be updated when the new value and the current value are not [`deepStrictEqual`](https://nodejs.org/api/assert.html#comparison-details_1).
+```shell
+npm install -D ardunno-cli boards-list @types/vscode
+```
 
-## FAQs
+Only one provider is active at a time. Choose the provider that matches your target. If you target IDE2 only, use the IDE2 provider ID and do not include BoardLab.
 
----
+## Resolve provider at runtime
 
-- Q: What does ⚠️ `@alpha` mean?
-- A: This API is in an alpha state and might change. The initial idea of this project was to establish a bare minimum layer and help Arduino IDE tool developers start with something. I make breaking changes only when necessary, keep it backward compatible, or provide a migration guide in the future. Please prepare for breaking changes.
+```ts
+import * as vscode from 'vscode'
+import type { ArduinoContext } from 'vscode-arduino-api'
 
----
+// Visual Studio Code + BoardLab target.
+const PROVIDERS = ['dankeboy36.boardlab'] as const
 
-- Q: Why do I have to install `vscode-arduino-api` from `npm`.
-- A: `vscode-arduino-api` only contains types for the API. The actual code will be part of the VS Code extension.
+// Arduino IDE 2.x target: use this instead of the BoardLab provider.
+// const PROVIDERS = ['dankeboy36.vscode-arduino-api'] as const
 
----
+export function tryGetArduinoContext(): ArduinoContext | undefined {
+  for (const id of PROVIDERS) {
+    const ext = vscode.extensions.getExtension(id)
+    const api = ext?.exports as ArduinoContext | undefined
+    if (api) return api
+  }
+  return undefined
+}
+```
 
-- Q: Are there any dependent examples?
-- A: Yes, for example, [dankeboy36/esp-exception-decoder](https://github.com/dankeboy36/esp-exception-decoder) or [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
+## Publishing guidance
+
+- Visual Studio Code extension: add `extensionDependencies` on `dankeboy36.boardlab`.
+- Arduino IDE 2.x tool VSIX: do not add `extensionDependencies`; IDE2 does not download from Open VSX or the Visual Studio Code Marketplace.
+
+## Dist-tags and releases
+
+- IDE2 lane: publish 0.1.x patch releases and apply the `ide2` dist-tag, which always points to the latest 0.1.x version compatible with Arduino IDE 2.x.
+- BoardLab lane: `latest` remains 0.2.x+.
+
+```shell
+npm dist-tag ls vscode-arduino-api
+```
+
+## API reference
+
+See the generated API docs in [`docs/README.md`](./docs/README.md).

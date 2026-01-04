@@ -2,7 +2,7 @@
   "name": "vscode-arduino-api",
   "displayName": "VS Code Arduino API",
   "version": "0.2.2",
-  "description": "Arduino IDE API for VS Code extensions",
+  "description": "Type-only Arduino API contract for Arduino IDE 2.x and BoardLab extensions",
   "categories": [
     "Other"
   ],
@@ -22,10 +22,18 @@
   "license": "MIT",
   "author": "dankeboy36",
   "publisher": "dankeboy36",
+  "exports": {
+    ".": {
+      "types": "./out/api.d.ts"
+    }
+  },
   "main": "./dist/extension.js",
   "types": "out/api.d.ts",
   "files": [
-    "out/api.d.ts"
+    "out/api.d.ts",
+    "README.md",
+    "LICENSE",
+    "docs/**"
   ],
   "scripts": {
     "prebuild": "rimraf dist",
@@ -80,11 +88,6 @@
   "activationEvents": [
     "*"
   ],
-  "dependencies": {
-    "@types/vscode": "^1.78.0",
-    "ardunno-cli": "^0.1.8",
-    "boards-list": "^1.1.0"
-  },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@semantic-release/changelog": "^6.0.3",
@@ -96,10 +99,13 @@
     "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.78.0",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
+    "ardunno-cli": "^0.1.12",
+    "boards-list": "^2.0.0",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
@@ -122,6 +128,11 @@
     "typescript": "^5.0.4",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1"
+  },
+  "peerDependencies": {
+    "@types/vscode": "^1.78.0",
+    "ardunno-cli": "^0.1.12",
+    "boards-list": "^1.1.0"
   },
   "engines": {
     "vscode": "^1.78.0"

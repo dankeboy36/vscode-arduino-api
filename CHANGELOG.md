@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.2...0.2.3) (2026-01-04)
+
+
+### Bug Fixes
+
+* clarify IDE2 vs BoardLab split + types-only ([#21](https://github.com/dankeboy36/vscode-arduino-api/issues/21)) ([88c75b5](https://github.com/dankeboy36/vscode-arduino-api/commit/88c75b50c30c823467d63a5d12645fd965e2a967))
+
 ## [0.2.2](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.1...0.2.2) (2026-01-03)
 
 

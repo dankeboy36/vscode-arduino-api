@@ -9,7 +9,7 @@ The `main` entry in `package.json` exists for the Arduino IDE 2.x / Theia extens
 
 ## What this is
 
-- A compile-time contract for the [`ArduinoContext` API](./docs/README.md).
+- A compile-time contract for the `ArduinoContext` API.
 - The npm package contains no runtime JavaScript.
 - The runtime provider is host-specific (IDE2 built-in or BoardLab in VS Code).
 

@@ -25,5 +25,7 @@
 
 - [BoardIdentifier](type-aliases/BoardIdentifier.md)
 - [BuildProperties](type-aliases/BuildProperties.md)
+- [CliPort](type-aliases/CliPort.md)
+- [Optional](type-aliases/Optional.md)
 - [Tool](type-aliases/Tool.md)
 - [Version](type-aliases/Version.md)

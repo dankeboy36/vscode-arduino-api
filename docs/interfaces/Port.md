@@ -29,11 +29,12 @@ The hardware ID (serial number) of the board attached to the port.
 
 ---
 
-### label
+### label?
 
-> **label**: `string`
+> `optional` **label**: `string`
 
-The port label to show on the GUI (e.g. "ttyACM0").
+The port label to show on the GUI (e.g. "ttyACM0"). Consumers may fall back
+to `address` when missing.
 
 ---
 

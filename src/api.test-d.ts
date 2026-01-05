@@ -35,9 +35,7 @@ expectAssignable<ApiPort>(cliPort)
 
 expectAssignable<ApiPort>({
   address: '',
-  label: '',
   protocol: '',
-  protocolLabel: '',
 })
 
 expectAssignable<ApiPort>({

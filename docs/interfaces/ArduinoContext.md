@@ -152,7 +152,7 @@ All opened sketch folders in the window.
 
 ### ~~port~~
 
-> `readonly` **port**: [`Port`](../type-aliases/Port.md) \| `undefined`
+> `readonly` **port**: [`Port`](Port.md) \| `undefined`
 
 The currently selected port in the Arduino IDE.
 

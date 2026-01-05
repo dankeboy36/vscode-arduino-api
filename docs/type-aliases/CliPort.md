@@ -6,7 +6,7 @@
 
 > **CliPort** = `Port`
 
-Arduino CLI port shape used as the base for [Port](Port.md).
+Arduino CLI port shape used as the base for [Port](../interfaces/Port.md).
 
 Alias of `ardunno-cli`'s `Port` type.
 

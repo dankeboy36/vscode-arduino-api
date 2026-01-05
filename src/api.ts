@@ -316,5 +316,21 @@ export interface ConfigValue extends CliConfigValue {}
  * @see {@link CliPort}
  * @see {@link https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Port | Arduino CLI Port}
  */
-export type Port = Optional<CliPort, 'hardwareId' | 'properties'>
+export interface Port {
+  /** Address of the port (e.g., `/dev/ttyACM0`). */
+  address: CliPort['address']
+  /**
+   * The port label to show on the GUI (e.g. "ttyACM0"). Consumers may fall back
+   * to `address` when missing.
+   */
+  label?: CliPort['label']
+  /** Protocol of the port (e.g., `serial`, `network`, ...). */
+  protocol: CliPort['protocol']
+  /** A human friendly description of the protocol (e.g., "Serial Port (USB)"). */
+  protocolLabel?: CliPort['protocolLabel']
+  /** A set of properties of the port. */
+  properties?: CliPort['properties']
+  /** The hardware ID (serial number) of the board attached to the port. */
+  hardwareId?: CliPort['hardwareId']
+}
 export interface Programmer extends CliProgrammer {}

@@ -52,7 +52,7 @@ The FQBN with all the custom board options (if any) for the sketch.
 
 ### port
 
-> `readonly` **port**: `Readonly`\<`Pick`\<`Port`, `"protocol"` \| `"address"`\>\> \| `Readonly`\<[`Port`](../type-aliases/Port.md)\> \| `undefined`
+> `readonly` **port**: `Readonly`\<`Pick`\<`Port`, `"protocol"` \| `"address"`\>\> \| `Readonly`\<[`Port`](Port.md)\> \| `undefined`
 
 **`Alpha`**
 

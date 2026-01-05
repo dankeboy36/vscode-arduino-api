@@ -29,12 +29,6 @@
   },
   "main": "./dist/extension.js",
   "types": "out/api.d.ts",
-  "files": [
-    "out/api.d.ts",
-    "README.md",
-    "LICENSE",
-    "docs/**"
-  ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "npm run typings && webpack --mode production --devtool hidden-source-map",

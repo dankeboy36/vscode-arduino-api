@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.3...0.2.4) (2026-01-05)
+
+
+### Bug Fixes
+
+* align `Port` optionality + add `tsd` coverage  ([#22](https://github.com/dankeboy36/vscode-arduino-api/issues/22)) ([5725ca7](https://github.com/dankeboy36/vscode-arduino-api/commit/5725ca7c17a7545f765e9979b0f517fec8c4311b))
+
 ## [0.2.3](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.2...0.2.3) (2026-01-04)
 
 

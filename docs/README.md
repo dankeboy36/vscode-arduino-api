@@ -16,7 +16,6 @@
 - [ConfigValue](interfaces/ConfigValue.md)
 - [Disposable](interfaces/Disposable.md)
 - [Event](interfaces/Event.md)
-- [Port](interfaces/Port.md)
 - [Programmer](interfaces/Programmer.md)
 - [SketchFolder](interfaces/SketchFolder.md)
 - [SketchFoldersChangeEvent](interfaces/SketchFoldersChangeEvent.md)
@@ -25,5 +24,8 @@
 
 - [BoardIdentifier](type-aliases/BoardIdentifier.md)
 - [BuildProperties](type-aliases/BuildProperties.md)
+- [CliPort](type-aliases/CliPort.md)
+- [Optional](type-aliases/Optional.md)
+- [Port](type-aliases/Port.md)
 - [Tool](type-aliases/Tool.md)
 - [Version](type-aliases/Version.md)

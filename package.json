@@ -46,8 +46,10 @@
     "format": "prettier --write .",
     "lint": "eslint src --ext ts",
     "release": "semantic-release",
-    "pretest": "npm run compile-tests",
-    "test": "node ./out/test/runTest.js",
+    "pretest": "npm run test:typings && npm run compile-tests",
+    "test": "npm run test:typings && npm run test:vsix",
+    "test:typings": "npm run typings && tsd",
+    "test:vsix": "node ./out/test/runTest.js",
     "typings": "tsc -p . --declaration --declarationMap --outDir out",
     "watch": "webpack --watch",
     "watch-tests": "tsc -p . -w --outDir out"
@@ -123,6 +125,7 @@
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
+    "tsd": "^0.33.0",
     "typedoc": "^0.28.15",
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.0.4",
@@ -136,6 +139,9 @@
   },
   "engines": {
     "vscode": "^1.78.0"
+  },
+  "tsd": {
+    "directory": "src"
   },
   "vsce": {
     "allowStarActivation": true

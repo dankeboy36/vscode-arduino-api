@@ -39,6 +39,8 @@ BoardLab provides the runtime API in Visual Studio Code and must be present as a
 
 ### Arduino IDE 2.x tools (deprecated API)
 
+![NPM Version (with ide2 tag)](https://img.shields.io/npm/v/vscode-arduino-api/ide2)
+
 ```shell
 npm install -D vscode-arduino-api@ide2
 ```

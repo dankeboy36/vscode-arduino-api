@@ -131,8 +131,8 @@
   },
   "peerDependencies": {
     "@types/vscode": "^1.78.0",
-    "ardunno-cli": "^0.1.12",
-    "boards-list": "^2.0.0"
+    "ardunno-cli": "^0.1.12 || >=1 <2",
+    "boards-list": ">=2 <3"
   },
   "engines": {
     "vscode": "^1.78.0"

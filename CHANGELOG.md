@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.5...0.2.6) (2026-02-24)
+
+
+### Bug Fixes
+
+* extend range of peer dependencies ([#24](https://github.com/dankeboy36/vscode-arduino-api/issues/24)) ([b262eba](https://github.com/dankeboy36/vscode-arduino-api/commit/b262eba51a13600dc62ea4724c2c2d3f39ce3f1f))
+
 ## [0.2.5](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.4...0.2.5) (2026-02-24)
 
 

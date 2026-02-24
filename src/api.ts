@@ -3,7 +3,6 @@ import type {
   BuilderResult,
   ConfigOption as CliConfigOption,
   ConfigValue as CliConfigValue,
-  Port as CliPort,
   Programmer as CliProgrammer,
   ToolsDependencies,
 } from 'ardunno-cli'
@@ -236,6 +235,22 @@ export type Version = string
 export type BuildProperties = Readonly<Record<string, string>>
 
 /**
+ * Makes a subset of keys optional while keeping the rest unchanged.
+ *
+ * Example: `Optional<Foo, 'bar' | 'baz'>` makes `bar` and `baz` optional.
+ */
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+/**
+ * Arduino CLI port shape used as the base for {@link Port}.
+ *
+ * Alias of `ardunno-cli`'s `Port` type.
+ *
+ * @see {@link https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Port | Arduino CLI Port}
+ */
+export type CliPort = import('ardunno-cli').Port
+
+/**
  * The lightweight representation of all details of a particular board. See
  * [`BoardDetailsResponse`](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.BoardDetailsResponse)
  * for the CLI API.
@@ -295,5 +310,27 @@ export type { BoardIdentifier } from 'boards-list'
 export type { Event } from 'vscode'
 export interface ConfigOption extends CliConfigOption {}
 export interface ConfigValue extends CliConfigValue {}
-export interface Port extends CliPort {}
+/**
+ * CLI port with optional `hardwareId` and `properties` to match boards-list.
+ *
+ * @see {@link CliPort}
+ * @see {@link https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Port | Arduino CLI Port}
+ */
+export interface Port {
+  /** Address of the port (e.g., `/dev/ttyACM0`). */
+  address: CliPort['address']
+  /**
+   * The port label to show on the GUI (e.g. "ttyACM0"). Consumers may fall back
+   * to `address` when missing.
+   */
+  label?: CliPort['label']
+  /** Protocol of the port (e.g., `serial`, `network`, ...). */
+  protocol: CliPort['protocol']
+  /** A human friendly description of the protocol (e.g., "Serial Port (USB)"). */
+  protocolLabel?: CliPort['protocolLabel']
+  /** A set of properties of the port. */
+  properties?: CliPort['properties']
+  /** The hardware ID (serial number) of the board attached to the port. */
+  hardwareId?: CliPort['hardwareId']
+}
 export interface Programmer extends CliProgrammer {}

@@ -13,8 +13,8 @@ on:
       - main
 
 jobs:
-  checks:
-    name: Checks (ubuntu-latest, node-22.14.0)
+  tests:
+    name: Tests (ubuntu-latest, node-22.14.0)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,13 +39,13 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Generate Typings
-        run: npm run typings
+      - name: Test Typings
+        run: npm run test:typings
 
   release:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    needs: [checks]
+    needs: [tests]
     permissions:
       contents: read
       id-token: write

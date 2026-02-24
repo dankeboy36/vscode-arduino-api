@@ -4,9 +4,12 @@
 
 # Interface: Port
 
-## Extends
+CLI port with optional `hardwareId` and `properties` to match boards-list.
 
-- `Port`
+## See
+
+- [CliPort](../type-aliases/CliPort.md)
+- [Arduino CLI Port](https://arduino.github.io/arduino-cli/latest/rpc/commands/#cc.arduino.cli.commands.v1.Port)
 
 ## Properties
 
@@ -16,49 +19,34 @@
 
 Address of the port (e.g., `/dev/ttyACM0`).
 
-#### Inherited from
-
-`CliPort.address`
-
 ---
 
-### hardwareId
+### hardwareId?
 
-> **hardwareId**: `string`
+> `optional` **hardwareId**: `string`
 
 The hardware ID (serial number) of the board attached to the port.
 
-#### Inherited from
+---
 
-`CliPort.hardwareId`
+### label?
+
+> `optional` **label**: `string`
+
+The port label to show on the GUI (e.g. "ttyACM0"). Consumers may fall back
+to `address` when missing.
 
 ---
 
-### label
+### properties?
 
-> **label**: `string`
-
-The port label to show on the GUI (e.g. "ttyACM0").
-
-#### Inherited from
-
-`CliPort.label`
-
----
-
-### properties
-
-> **properties**: `object`
+> `optional` **properties**: `object`
 
 A set of properties of the port.
 
 #### Index Signature
 
 \[`key`: `string`\]: `string`
-
-#### Inherited from
-
-`CliPort.properties`
 
 ---
 
@@ -68,18 +56,10 @@ A set of properties of the port.
 
 Protocol of the port (e.g., `serial`, `network`, ...).
 
-#### Inherited from
-
-`CliPort.protocol`
-
 ---
 
-### protocolLabel
+### protocolLabel?
 
-> **protocolLabel**: `string`
+> `optional` **protocolLabel**: `string`
 
 A human friendly description of the protocol (e.g., "Serial Port (USB)").
-
-#### Inherited from
-
-`CliPort.protocolLabel`

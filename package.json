@@ -1,6 +1,7 @@
 {
   "name": "vscode-arduino-api",
-  "version": "0.2.3",
+  "displayName": "VS Code Arduino API",
+  "version": "0.2.4",
   "description": "Type-only Arduino API contract for Arduino IDE 2.x and BoardLab extensions",
   "keywords": [
     "arduino",
@@ -36,7 +37,9 @@
     "format": "prettier --write .",
     "lint": "eslint src --ext ts",
     "release": "semantic-release",
-    "typings": "tsc -p . --declaration --declarationMap --emitDeclarationOnly --outDir out"
+    "test": "npm run test:typings",
+    "test:typings": "npm run typings && tsd",
+    "typings": "tsc -p . --declaration --declarationMap --outDir out"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -63,13 +66,17 @@
     "prettier-plugin-packagejson": "^2.5.18",
     "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
+    "tsd": "^0.33.0",
     "typedoc": "^0.28.15",
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
     "@types/vscode": "^1.78.0",
-    "ardunno-cli": "^0.1.12 || >=1 <2",
-    "boards-list": ">=2 <3"
+    "ardunno-cli": "^0.1.12",
+    "boards-list": "^2.0.0"
+  },
+  "tsd": {
+    "directory": "src"
   }
 }

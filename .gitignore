@@ -2,7 +2,4 @@ out
 dist
 node_modules
 .vscode-test/
-*.vsix
-src/test/test-workspace/*
-!src/test/test-workspace/.gitkeep
 .nyc_output

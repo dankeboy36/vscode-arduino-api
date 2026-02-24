@@ -13,24 +13,19 @@ on:
       - main
 
 jobs:
-  test:
-    name: Test (${{ matrix.os }}, node-${{ matrix.node }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        node: [22.14.0]
-    runs-on: ${{ matrix.os }}
+  tests:
+    name: Tests (ubuntu-latest, node-22.14.0)
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22.14.0
 
       - name: Install Dependencies
         run: npm ci
@@ -44,31 +39,29 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test Typings
+        run: npm run test:typings
 
   release:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [tests]
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 22.14.0
 
       - name: Install Dependencies
         run: npm ci
-
-      - name: Build
-        run: npm run build
 
       - name: Generate Typings
         run: npm run typings
@@ -79,13 +72,14 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           GITHUB_TOKEN: op://cicd_dankeboy36/GITHUB_TOKEN/credential
-          NPM_TOKEN: op://cicd_dankeboy36/NPM_TOKEN/credential
+
+      - name: Update npm (OIDC trusted publish requires npm >= 11.5.1)
+        run: npm install -g npm@^11.5.1
 
       - name: Release
         id: release
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ steps.load_secrets.outputs.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ steps.load_secrets.outputs.NPM_TOKEN }}
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}

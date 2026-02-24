@@ -1,8 +1,0 @@
-*
-!package.json
-!README.md
-!LICENSE
-!out/
-!out/api.d.ts
-!docs/
-!docs/**

@@ -5,8 +5,6 @@
 
 This is a types-only npm package providing the ArduinoContext API contract for Arduino IDE 2.x and BoardLab tools. The npm tarball ships no runtime JavaScript; runtime providers are supplied by the host environment.
 
-The `main` entry in `package.json` exists for the Arduino IDE 2.x / Theia extension build. The runtime JavaScript referenced by `main` is not published to npm.
-
 ## What this is
 
 - A compile-time contract for the `ArduinoContext` API.
@@ -80,7 +78,7 @@ export function tryGetArduinoContext(): ArduinoContext | undefined {
 ## Publishing guidance
 
 - Visual Studio Code extension: add `extensionDependencies` on `dankeboy36.boardlab`.
-- Arduino IDE 2.x tool VSIX: do not add `extensionDependencies`; IDE2 does not download from Open VSX or the Visual Studio Code Marketplace.
+- This repo publishes npm types only; it does not build or publish a VSIX artifact.
 
 ## Dist-tags and releases
 

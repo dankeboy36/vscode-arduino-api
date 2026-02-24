@@ -1,3 +1,10 @@
+## [0.2.5](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.4...0.2.5) (2026-02-24)
+
+
+### Bug Fixes
+
+* relax Arduino CLI and boards list peer deps ([#23](https://github.com/dankeboy36/vscode-arduino-api/issues/23)) ([c7b5aaa](https://github.com/dankeboy36/vscode-arduino-api/commit/c7b5aaaa47d8cf2375cf3ccd9c0b7c5e30ef7945))
+
 ## [0.2.4](https://github.com/dankeboy36/vscode-arduino-api/compare/0.2.3...0.2.4) (2026-01-05)
 
 
